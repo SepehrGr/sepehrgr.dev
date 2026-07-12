@@ -41,7 +41,7 @@ export function ContactCard(): ReactNode {
                   where strong frontend craft can make a difference.{' '}
                 </p>
                 <p className='text-foreground/65 mb-6 text-[18px] leading-[1.4] tracking-tight sm:text-[22px]'>
-                  Reach out to me at{' '}
+                  Reach out at{' '}
                   <a
                     href='mailto:contact@sepehrgr.dev'
                     className='text-foreground/85 group/email relative inline-block font-medium'
