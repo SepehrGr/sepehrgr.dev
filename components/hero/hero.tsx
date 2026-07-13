@@ -12,7 +12,7 @@ const PORTRAIT_HOVER_SRC = '/josh_wave.webp'
 export function Hero(): ReactNode {
   return (
     <section className='relative w-full'>
-      <div className='mx-auto w-full max-w-300 px-6 pt-44 pb-24 sm:px-10 sm:pt-56 sm:pb-32'>
+      <div className='mx-auto w-full max-w-300 px-6 pt-28 pb-24 sm:px-10 sm:pt-56 sm:pb-32 md:pt-44'>
         <div className='grid grid-cols-1 items-center gap-8 md:grid-cols-2 md:gap-8'>
           <FadeIn className='flex flex-col gap-4'>
             <p className='text-foreground leading-tight tracking-tight md:text-[20px]'>
