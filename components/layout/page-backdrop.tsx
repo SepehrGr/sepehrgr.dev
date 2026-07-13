@@ -12,15 +12,15 @@ export function PageBackdrop(): ReactNode {
   return (
     <div
       aria-hidden='true'
-      className='pointer-events-none absolute inset-x-0 top-0 -z-10 h-450 overflow-hidden'
+      className='pointer-events-none absolute inset-x-0 top-0 -z-10 h-350 overflow-hidden'
     >
       <div className='absolute inset-0 opacity-80 blur-xs'>
         <ShaderFlow
           colorLowA={isDark ? [0.15, 0.1, 0.4] : [0.15, 0.1, 0.5]}
           colorHighA={isDark ? [0.4, 0.4, 0.4] : [0.6, 0.6, 0.6]}
           brightness={isDark ? 3 : 2}
-          iterations={25}
-          flowSpeed={[0, 0.15]}
+          iterations={15}
+          flowSpeed={[0.15, 0.25]}
         />
       </div>
     </div>
