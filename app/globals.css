@@ -1,42 +1,42 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 @font-face {
-  font-family: "j";
-  src: url("../assets/j-light.ttf") format("truetype");
+  font-family: 'j';
+  src: url('../assets/j-light.ttf') format('truetype');
   font-weight: 300;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "j";
-  src: url("../assets/j-regular.ttf") format("truetype");
+  font-family: 'j';
+  src: url('../assets/j-regular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "j";
-  src: url("../assets/j-medium.ttf") format("truetype");
+  font-family: 'j';
+  src: url('../assets/j-medium.ttf') format('truetype');
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "j";
-  src: url("../assets/j-semibold.ttf") format("truetype");
+  font-family: 'j';
+  src: url('../assets/j-semibold.ttf') format('truetype');
   font-weight: 600;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "j";
-  src: url("../assets/j-bold.ttf") format("truetype");
+  font-family: 'j';
+  src: url('../assets/j-bold.ttf') format('truetype');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -51,7 +51,7 @@
   --ring: #0066ff;
   --frame: #f9f8f6;
   --font-sans:
-    "j", var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+    'j', var(--font-geist-sans), system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
   --font-serif: var(--font-fraunces), ui-serif, Georgia, serif;
 }
@@ -135,11 +135,11 @@ body {
   mix-blend-mode: normal;
 }
 
-html[data-theme-anim="1"]::view-transition-old(root) {
+html[data-theme-anim='1']::view-transition-old(root) {
   z-index: 0;
 }
 
-html[data-theme-anim="1"]::view-transition-new(root) {
+html[data-theme-anim='1']::view-transition-new(root) {
   z-index: 1;
   animation: theme-reveal 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -154,7 +154,7 @@ html[data-theme-anim="1"]::view-transition-new(root) {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html[data-theme-anim="1"]::view-transition-new(root) {
+  html[data-theme-anim='1']::view-transition-new(root) {
     animation: none;
   }
 }
@@ -216,6 +216,8 @@ html[data-theme-anim="1"]::view-transition-new(root) {
 }
 
 .project-card {
+  isolation: isolate;
+  contain: paint;
   transform: translateY(0);
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
   transition:
@@ -225,12 +227,37 @@ html[data-theme-anim="1"]::view-transition-new(root) {
   will-change: transform;
 }
 
+.project-card::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  content: '';
+  pointer-events: none;
+  opacity: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at 100% 0%,
+    color-mix(in srgb, var(--project-accent) 60%, transparent) 0%,
+    transparent 48%
+  );
+  transition: opacity 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.project-card > * {
+  position: relative;
+  z-index: 1;
+}
+
 .project-card:hover {
   transform: translateY(-4px);
   border-color: color-mix(in srgb, var(--foreground) 14%, transparent);
   box-shadow:
     0 10px 20px -8px rgb(0 0 0 / 0.12),
     0 4px 8px -4px rgb(0 0 0 / 0.08);
+}
+
+.project-card:hover::before {
+  opacity: 0.28;
 }
 
 .dark .project-card {
@@ -250,11 +277,8 @@ html[data-theme-anim="1"]::view-transition-new(root) {
 .project-card__image-inner {
   position: absolute;
   inset: 0;
-  transform: scale(1);
-  transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: transform;
 }
 
-.project-card:hover .project-card__image-inner {
-  transform: scale(1.06);
+.project-card__details {
+  overflow: hidden;
 }
