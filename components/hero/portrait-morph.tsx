@@ -318,6 +318,7 @@ export function PortraitMorph({
       }}
     >
       {!ready ? (
+        // eslint-disable-next-line @next/next/no-img-element -- placeholder must share the texture's URL (cache hit)
         <img
           src={srcA}
           alt={alt}

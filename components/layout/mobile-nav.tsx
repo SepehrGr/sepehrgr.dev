@@ -6,24 +6,22 @@ import { AnimatePresence, motion } from 'motion/react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useLenis } from '@/components/layout/smooth-scroll'
-import { NAV_ITEMS, ThemeToggle } from './nav'
+import { NAV_ITEMS, ThemeToggle, useIsMounted } from './nav'
 import { StaggerContainer, StaggerItem } from '@/lib/motion'
 
 export default function MobileNav() {
   const [isOpen, setIsOpen] = useState(false)
-  const [mounted, setMounted] = useState(false)
+  // Ensure we only portal on client
+  const mounted = useIsMounted()
   const pathname = usePathname()
   const lenis = useLenis()
 
-  // Ensure we only portal on client
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
   // Close menu on route change
-  useEffect(() => {
+  const [prevPathname, setPrevPathname] = useState(pathname)
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname)
     setIsOpen(false)
-  }, [pathname])
+  }
 
   // Keyboard escape + body scroll lock
   useEffect(() => {

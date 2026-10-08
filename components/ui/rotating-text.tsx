@@ -225,13 +225,11 @@ const RotatingText = forwardRef<RotatingTextRef, RotatingTextProps>(
       beginTransitionTo(0)
     }, [beginTransitionTo])
 
-    useEffect(() => {
-      if (texts.length === 0) return
-      if (displayIndex >= texts.length) {
-        setDisplayIndex(texts.length - 1)
-        setWidthIndex(texts.length - 1)
-      }
-    }, [texts.length, displayIndex])
+    // Clamp during render when texts shrinks
+    if (texts.length > 0 && displayIndex >= texts.length) {
+      setDisplayIndex(texts.length - 1)
+      setWidthIndex(texts.length - 1)
+    }
 
     useImperativeHandle(
       ref,

@@ -143,6 +143,7 @@ function CompanyLogo({ entry }: { entry: Entry }): ReactNode {
       }}
     >
       {entry.slug ? (
+        // eslint-disable-next-line @next/next/no-img-element -- remote SVG, nothing for next/image to optimize
         <img
           src={`https://cdn.simpleicons.org/${entry.slug}`}
           alt=''

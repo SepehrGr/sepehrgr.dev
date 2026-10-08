@@ -281,6 +281,7 @@ function ChipPill({ chip }: { chip: Chip }): ReactNode {
         style={{ borderRadius: `${ICON_RADIUS}px` }}
         aria-hidden='true'
       >
+        {/* eslint-disable-next-line @next/next/no-img-element -- remote SVG, nothing for next/image to optimize */}
         <img
           src={chip.iconUrl ?? `https://cdn.simpleicons.org/${chip.slug}`}
           alt=''

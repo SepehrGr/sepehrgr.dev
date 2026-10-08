@@ -26,7 +26,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { label: 'About', href: '/about' },
 ]
 
-function useIsMounted(): boolean {
+export function useIsMounted(): boolean {
   return useSyncExternalStore(
     () => () => {},
     () => true,
@@ -118,6 +118,7 @@ export function Nav(): ReactNode {
   const listRef = useRef<HTMLUListElement>(null)
   const itemRefs = useRef<Array<HTMLLIElement | null>>([])
   const [pillRect, setPillRect] = useState<{
+    index: number
     x: number
     width: number
   } | null>(null)
@@ -132,13 +133,11 @@ export function Nav(): ReactNode {
   useLayoutEffect(() => {
     const list = listRef.current
     const activeEl = activeIndex >= 0 ? itemRefs.current[activeIndex] : null
-    if (!list || !activeEl) {
-      setPillRect(null)
-      return
-    }
+    if (!list || !activeEl) return
     const listRect = list.getBoundingClientRect()
     const itemRect = activeEl.getBoundingClientRect()
     setPillRect({
+      index: activeIndex,
       x: itemRect.left - listRect.left,
       width: itemRect.width,
     })
@@ -154,7 +153,7 @@ export function Nav(): ReactNode {
     <nav aria-label='Primary' className='hidden md:block'>
       <div className='border-foreground/8 bg-background/30 flex items-center gap-1 rounded-full border p-1.5 shadow-sm backdrop-blur'>
         <ul ref={listRef} className='relative flex items-center gap-1'>
-          {pillRect && (
+          {pillRect?.index === activeIndex && (
             <motion.span
               aria-hidden='true'
               initial={false}
