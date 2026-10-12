@@ -79,3 +79,39 @@ jobs:
             org.opencontainers.image.source=https://github.com/SepehrGr/sepehrgr.dev
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy to production
+    needs: image
+    if: github.event_name == 'push' # only after a merge to main, never on PRs
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: production
+      url: https://sepehrgr.dev
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false # never interrupt a deploy halfway
+    steps:
+      - name: Set up SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      - name: Deploy this commit
+        env:
+          HOST: ${{ vars.DEPLOY_HOST }}
+          PORT: ${{ vars.DEPLOY_PORT }}
+          USER_NAME: ${{ vars.DEPLOY_USER }}
+          TAG: sha-${{ github.sha }}
+        run: |
+          ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+              -p "$PORT" "$USER_NAME@$HOST" "deploy $TAG"
+
+      - name: Check the public site
+        run: curl -fsS -o /dev/null --retry 5 --retry-delay 3 --retry-all-errors https://sepehrgr.dev/
