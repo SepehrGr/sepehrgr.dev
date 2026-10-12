@@ -1,0 +1,7 @@
+services:
+  web:
+    build: .                   # build from the Dockerfile in this folder
+    image: sepehrgr-dev:local  # name for the resulting image
+    ports:
+      - "3000:3000"            # your-Mac-port:container-port
+    restart: unless-stopped    # restart it if it crashes
