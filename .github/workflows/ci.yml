@@ -96,12 +96,24 @@ jobs:
       - name: Set up SSH
         env:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
-          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+          HOST: ${{ vars.DEPLOY_HOST }}
+          PORT: ${{ vars.DEPLOY_PORT }}
+          EXPECTED_FP: ${{ vars.DEPLOY_HOST_FINGERPRINT }}
         run: |
           install -m 700 -d ~/.ssh
           printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+          # Fetch the server's host key and accept it only if its fingerprint matches the pinned one
+          ssh-keyscan -p "$PORT" -t ed25519 "$HOST" > /tmp/scanned_key 2>/dev/null || true
+          ACTUAL_FP="$(ssh-keygen -lf /tmp/scanned_key 2>/dev/null | awk '{print $2}' || true)"
+          echo "Expected host key: $EXPECTED_FP"
+          echo "Actual host key:   ${ACTUAL_FP:-<none: could not reach server>}"
+          if [ -z "$ACTUAL_FP" ] || [ "$ACTUAL_FP" != "$EXPECTED_FP" ]; then
+            echo "::error::Server host key does not match the pinned fingerprint. Refusing to deploy."
+            exit 1
+          fi
+          mv /tmp/scanned_key ~/.ssh/known_hosts
 
       - name: Deploy this commit
         env:
