@@ -114,3 +114,16 @@ jobs:
             exit 1
           fi
           mv /tmp/scanned_key ~/.ssh/known_hosts
+
+      - name: Deploy this commit
+        env:
+          HOST: ${{ vars.DEPLOY_HOST }}
+          PORT: ${{ vars.DEPLOY_PORT }}
+          USER_NAME: ${{ vars.DEPLOY_USER }}
+          TAG: sha-${{ github.sha }}
+        run: |
+          ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+              -p "$PORT" "$USER_NAME@$HOST" "deploy $TAG"
+
+      - name: Check the public site
+        run: curl -fsS -o /dev/null --retry 5 --retry-delay 3 --retry-all-errors https://sepehrgr.dev/
