@@ -92,7 +92,7 @@ export function ContactCard(): ReactNode {
 
                   <div className='flex items-center gap-3'>
                     <SocialIcon
-                      href='https://github.com/sepehrgr7'
+                      href='https://github.com/sepehrgr'
                       label='GitHub'
                       lucideIcon={Github}
                       index={0}
