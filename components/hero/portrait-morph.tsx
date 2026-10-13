@@ -110,7 +110,8 @@ void main() {
   float darken = edgeBand * 0.35 * bell;
   color.rgb *= 1.0 - darken;
 
-  gl_FragColor = color;
+  // Grayscale here instead of a CSS filter on the live canvas (saves a compositor pass)
+  gl_FragColor = vec4(vec3(dot(color.rgb, vec3(0.2126, 0.7152, 0.0722))), color.a);
 }
 `
 
@@ -186,26 +187,23 @@ export function PortraitMorph({
     const mesh = new Mesh(gl, { geometry, program })
     mesh.setParent(scene)
 
-    const resize = () => {
-      const w = container.clientWidth
-      const h = container.clientHeight
-      renderer.setSize(w, h)
-      canvas.style.width = '100%'
-      canvas.style.height = '100%'
-      program.uniforms.uResolution.value = [w * renderer.dpr, h * renderer.dpr]
-    }
-    const ro = new ResizeObserver(resize)
-    ro.observe(container)
-    resize()
-
+    // Renders on demand: one frame once textures load or on resize, and a rAF
+    // loop only while the morph is transitioning. Idle = zero GPU work.
     let raf = 0
-    let last = performance.now()
+    let last = 0
     let time = 0
-    let running = true
+    let texturesReady = false
 
-    const tick = () => {
-      if (!running) return
-      const now = performance.now()
+    const draw = () => {
+      program.uniforms.uTime.value = time
+      program.uniforms.uProgress.value = progressRef.current
+      program.uniforms.uOrigin.value = originRef.current
+      program.uniforms.uDirection.value = directionRef.current
+      program.uniforms.uImageSize.value = imageSize
+      renderer.render({ scene })
+    }
+
+    const tick = (now: number) => {
       const dt = Math.min((now - last) / 1000, 0.05)
       last = now
       time += dt
@@ -214,26 +212,42 @@ export function PortraitMorph({
       const stiffness = hoverRef.current ? 2.4 : 2.0
       const k = 1 - Math.exp(-stiffness * dt)
       progressRef.current += (target - progressRef.current) * k
+      const settled = Math.abs(target - progressRef.current) < 0.001
+      if (settled) progressRef.current = target
 
-      program.uniforms.uTime.value = time
-      program.uniforms.uProgress.value = progressRef.current
-      program.uniforms.uOrigin.value = originRef.current
-      program.uniforms.uDirection.value = directionRef.current
-      program.uniforms.uImageSize.value = imageSize
+      draw()
+      raf = settled ? 0 : requestAnimationFrame(tick)
+    }
 
-      renderer.render({ scene })
+    const animate = () => {
+      if (raf || !texturesReady) return
+      last = performance.now()
       raf = requestAnimationFrame(tick)
     }
 
     Promise.all([loadImage(srcA, texA), loadImage(srcB, texB)])
       .then(() => {
+        texturesReady = true
         setReady(true)
-        last = performance.now()
-        tick()
+        draw()
       })
       .catch(() => {
         setReady(false)
       })
+
+    const resize = () => {
+      const w = container.clientWidth
+      const h = container.clientHeight
+      renderer.setSize(w, h)
+      canvas.style.width = '100%'
+      canvas.style.height = '100%'
+      program.uniforms.uResolution.value = [w * renderer.dpr, h * renderer.dpr]
+      // setSize clears the canvas; repaint unless the loop is about to
+      if (texturesReady && !raf) draw()
+    }
+    const ro = new ResizeObserver(resize)
+    ro.observe(container)
+    resize()
 
     const computeEdgeDirection = (x: number, y: number): [number, number] => {
       const dxLeft = x
@@ -255,6 +269,7 @@ export function PortraitMorph({
       directionRef.current = computeEdgeDirection(x, y)
       lastPointerRef.current = { x, y, t: performance.now() }
       hoverRef.current = true
+      animate()
     }
     const onPointerLeave = (e: PointerEvent) => {
       const rect = container.getBoundingClientRect()
@@ -266,6 +281,7 @@ export function PortraitMorph({
         number
       ]
       hoverRef.current = false
+      animate()
     }
     const onPointerMove = (e: PointerEvent) => {
       const rect = container.getBoundingClientRect()
@@ -292,7 +308,6 @@ export function PortraitMorph({
     container.addEventListener('pointermove', onPointerMove)
 
     return () => {
-      running = false
       cancelAnimationFrame(raf)
       ro.disconnect()
       container.removeEventListener('pointerenter', onPointerEnter)
@@ -313,8 +328,7 @@ export function PortraitMorph({
       style={{
         position: 'relative',
         width: '100%',
-        height: '100%',
-        filter: 'grayscale(100%)'
+        height: '100%'
       }}
     >
       {!ready ? (
@@ -323,7 +337,7 @@ export function PortraitMorph({
           src={srcA}
           alt={alt}
           draggable={false}
-          className='absolute inset-0 h-full w-full object-cover select-none'
+          className='absolute inset-0 h-full w-full object-cover grayscale select-none'
         />
       ) : null}
     </div>
