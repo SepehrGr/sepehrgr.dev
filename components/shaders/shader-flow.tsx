@@ -3,6 +3,8 @@
 import { Mesh, Program, Renderer, Transform, Triangle } from 'ogl'
 import { useEffect, useRef, type ReactNode } from 'react'
 
+import { createRenderLoop } from '@/lib/render-loop'
+
 export type ShaderFlowProps = {
   className?: string
   flowSpeed?: [number, number]
@@ -34,8 +36,13 @@ uniform vec3 uColorHigh;
 uniform vec3 uBgColor;
 uniform vec4 uFadeShape;
 
-float h(vec2 p){
-  return sin(p.x+sin(p.y+uT*uV.x))*sin(p.y*p.x*0.1+uT*uV.y);
+// Analytic gradient of h(p)=sin(p.x+sin(p.y+uT*uV.x))*sin(p.y*p.x*0.1+uT*uV.y).
+// Replaces the 3-sample forward difference: 6 trig calls instead of 9, same look.
+vec2 grad(vec2 p){
+  float s1=sin(p.y+uT*uV.x), c1=cos(p.y+uT*uV.x);
+  float u=p.x+s1, su=sin(u), cu=cos(u);
+  float v=p.y*p.x*0.1+uT*uV.y, sv=sin(v), cv=cos(v);
+  return vec2(cu*sv+su*cv*0.1*p.y, cu*c1*sv+su*cv*0.1*p.x);
 }
 
 float fadeAlpha(float d){
@@ -45,8 +52,17 @@ float fadeAlpha(float d){
 
 void main(){
   vec2 frag=gl_FragCoord.xy/uR;
+  float aspect=uR.x/uR.y;
+
+  vec2 ndc=vec2(frag.x,1.0-frag.y);
+  float dx=((ndc.x-uFadeShape.x)*aspect)/uFadeShape.z;
+  float dy=(ndc.y-uFadeShape.y)/uFadeShape.w;
+  float fa=fadeAlpha(sqrt(dx*dx+dy*dy));
+  // Outside the fade ellipse the result is pure background: skip the flow loop
+  if(fa<=0.0){gl_FragColor=vec4(uBgColor,1.0);return;}
+
   vec2 p=frag-0.5;
-  p.x*=uR.x/uR.y;
+  p.x*=aspect;
   p*=uS;
 
   float ms=uT*uMs*0.1;
@@ -54,14 +70,10 @@ void main(){
   float kt=uTw*0.01;
   float kd=1.0/uDe;
 
-  vec2 e=vec2(0.05,0.);
   vec2 r=vec2(0.);
   for(int i=0;i<24;i++){
     if(i>=uIt)break;
-    float a=h(p);
-    float b=h(p+e.xy);
-    float c=h(p+e.yx);
-    vec2 q=vec2(b-a,c-a)*20.;
+    vec2 q=grad(p);
     p+=vec2(-q.y,q.x)*kt+q*kd+d;
     r=q;
   }
@@ -69,14 +81,7 @@ void main(){
   float t=clamp(length(r)*0.5,0.0,1.0);
   vec3 col=mix(uColorLow,uColorHigh,t)*uB;
 
-  vec2 ndc=vec2(frag.x,1.0-frag.y);
-  float aspect=uR.x/uR.y;
-  float dx=((ndc.x-uFadeShape.x)*aspect)/uFadeShape.z;
-  float dy=(ndc.y-uFadeShape.y)/uFadeShape.w;
-  float fa=fadeAlpha(sqrt(dx*dx+dy*dy));
-
-  vec3 outColor=mix(uBgColor,col,fa);
-  gl_FragColor=vec4(outColor,1.0);
+  gl_FragColor=vec4(mix(uBgColor,col,fa),1.0);
 }`
 
 const D = {
@@ -126,12 +131,18 @@ function readBgColor(el: HTMLElement): [number, number, number] {
   return parseColor(raw) ?? [1, 1, 1]
 }
 
+// The field is soft: a half-res buffer upscaled by the browser looks the same as
+// full res + CSS blur, at a quarter of the fragments.
+const RENDER_SCALE = 0.5
+
 export function ShaderFlow(props: ShaderFlowProps): ReactNode {
   const ref = useRef<HTMLDivElement | null>(null)
   const pr = useRef(props)
+  const onProps = useRef<() => void>(() => {})
 
   useEffect(() => {
     pr.current = props
+    onProps.current()
   })
 
   useEffect(() => {
@@ -139,7 +150,7 @@ export function ShaderFlow(props: ShaderFlowProps): ReactNode {
     if (!el) return
 
     const r = new Renderer({
-      dpr: Math.min(window.devicePixelRatio || 1, 1),
+      dpr: RENDER_SCALE,
       alpha: false,
       antialias: false,
       powerPreference: 'high-performance'
@@ -185,37 +196,26 @@ export function ShaderFlow(props: ShaderFlowProps): ReactNode {
     const scene = new Transform()
     mesh.setParent(scene)
 
+    const loop = createRenderLoop(el, seconds => {
+      p.uniforms.uT.value = seconds
+      r.render({ scene })
+    })
+
     const onResize = (): void => {
       const w = el.clientWidth
       const h = el.clientHeight
       r.setSize(w, h)
       p.uniforms.uR.value = [gl.drawingBufferWidth, gl.drawingBufferHeight]
+      loop.invalidate()
     }
 
     onResize()
     const ro = new ResizeObserver(onResize)
     ro.observe(el)
 
-    let raf = 0
-    let visible = true
-    let onScreen = true
-    const t0 = performance.now()
-
-    const onVisibility = (): void => {
-      visible = document.visibilityState === 'visible'
-    }
-    document.addEventListener('visibilitychange', onVisibility)
-
-    const io = new IntersectionObserver(
-      entries => {
-        for (const e of entries) onScreen = e.isIntersecting
-      },
-      { rootMargin: '100px' }
-    )
-    io.observe(el)
-
     const syncBg = (): void => {
       p.uniforms.uBgColor.value = readBgColor(document.documentElement)
+      loop.invalidate()
     }
     const themeObserver = new MutationObserver(syncBg)
     themeObserver.observe(document.documentElement, {
@@ -240,22 +240,17 @@ export function ShaderFlow(props: ShaderFlowProps): ReactNode {
       ]
     }
 
-    const tick = (): void => {
-      if (visible && onScreen) {
-        p.uniforms.uT.value = (performance.now() - t0) / 1000
-        sync()
-        r.render({ scene })
-      }
-      raf = requestAnimationFrame(tick)
+    sync()
+    onProps.current = () => {
+      sync()
+      loop.invalidate()
     }
-    raf = requestAnimationFrame(tick)
 
     return () => {
-      cancelAnimationFrame(raf)
+      onProps.current = () => {}
+      loop.destroy()
       ro.disconnect()
-      io.disconnect()
       themeObserver.disconnect()
-      document.removeEventListener('visibilitychange', onVisibility)
       if (gl.canvas.parentElement === el) el.removeChild(gl.canvas)
       gl.getExtension('WEBGL_lose_context')?.loseContext()
     }

@@ -35,7 +35,7 @@ export function Hero(): ReactNode {
                   'Pixel Perfectionist',
                   'Lifelong Learner',
                 ]}
-                mainClassName='bg-foreground rounded-xl md:rounded-2xl text-background overflow-hidden p-2 md:px-3 backdrop-blur-lg'
+                mainClassName='bg-foreground rounded-xl md:rounded-2xl text-background overflow-hidden p-2 md:px-3'
                 staggerFrom='last'
                 initial={{ y: '100%' }}
                 animate={{ y: 0 }}

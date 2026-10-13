@@ -1,11 +1,11 @@
-import React, { forwardRef, useMemo, useRef, useLayoutEffect } from 'react'
-import { Canvas, useFrame, useThree, RootState } from '@react-three/fiber'
-import { Color, Mesh, ShaderMaterial } from 'three'
-import { IUniform } from 'three'
+'use client'
 
-type NormalizedRGB = [number, number, number]
+import { Mesh, Program, Renderer, Transform, Triangle } from 'ogl'
+import { useEffect, useRef, type ReactNode } from 'react'
 
-const hexToNormalizedRGB = (hex: string): NormalizedRGB => {
+import { createRenderLoop } from '@/lib/render-loop'
+
+const hexToNormalizedRGB = (hex: string): [number, number, number] => {
   const clean = hex.replace('#', '')
   const r = parseInt(clean.slice(0, 2), 16) / 255
   const g = parseInt(clean.slice(2, 4), 16) / 255
@@ -13,34 +13,20 @@ const hexToNormalizedRGB = (hex: string): NormalizedRGB => {
   return [r, g, b]
 }
 
-interface UniformValue<T = number | Color> {
-  value: T
-}
-
-interface SilkUniforms {
-  uSpeed: UniformValue<number>
-  uScale: UniformValue<number>
-  uNoiseIntensity: UniformValue<number>
-  uColor: UniformValue<Color>
-  uRotation: UniformValue<number>
-  uTime: UniformValue<number>
-  [uniform: string]: IUniform
-}
-
 const vertexShader = `
+attribute vec2 position;
 varying vec2 vUv;
-varying vec3 vPosition;
 
 void main() {
-  vPosition = position;
-  vUv = uv;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  vUv = position * 0.5 + 0.5;
+  gl_Position = vec4(position, 0.0, 1.0);
 }
 `
 
 const fragmentShader = `
+precision highp float;
+
 varying vec2 vUv;
-varying vec3 vPosition;
 
 uniform float uTime;
 uniform vec3  uColor;
@@ -84,46 +70,6 @@ void main() {
 }
 `
 
-interface SilkPlaneProps {
-  uniforms: SilkUniforms
-}
-
-const SilkPlane = forwardRef<Mesh, SilkPlaneProps>(function SilkPlane(
-  { uniforms },
-  ref
-) {
-  const { viewport } = useThree()
-
-  useLayoutEffect(() => {
-    const mesh = ref as React.MutableRefObject<Mesh | null>
-    if (mesh.current) {
-      mesh.current.scale.set(viewport.width, viewport.height, 1)
-    }
-  }, [ref, viewport])
-
-  useFrame((_state: RootState, delta: number) => {
-    const mesh = ref as React.MutableRefObject<Mesh | null>
-    if (mesh.current) {
-      const material = mesh.current.material as ShaderMaterial & {
-        uniforms: SilkUniforms
-      }
-      material.uniforms.uTime.value += 0.1 * delta
-    }
-  })
-
-  return (
-    <mesh ref={ref}>
-      <planeGeometry args={[1, 1, 1, 1]} />
-      <shaderMaterial
-        uniforms={uniforms}
-        vertexShader={vertexShader}
-        fragmentShader={fragmentShader}
-      />
-    </mesh>
-  )
-})
-SilkPlane.displayName = 'SilkPlane'
-
 export interface SilkProps {
   speed?: number
   scale?: number
@@ -132,32 +78,65 @@ export interface SilkProps {
   rotation?: number
 }
 
-const Silk: React.FC<SilkProps> = ({
+export default function Silk({
   speed = 5,
   scale = 1,
   color = '#7B7481',
   noiseIntensity = 1.5,
   rotation = 0
-}) => {
-  const meshRef = useRef<Mesh>(null)
+}: SilkProps): ReactNode {
+  const ref = useRef<HTMLDivElement | null>(null)
 
-  const uniforms = useMemo<SilkUniforms>(
-    () => ({
-      uSpeed: { value: speed },
-      uScale: { value: scale },
-      uNoiseIntensity: { value: noiseIntensity },
-      uColor: { value: new Color(...hexToNormalizedRGB(color)) },
-      uRotation: { value: rotation },
-      uTime: { value: 0 }
-    }),
-    [speed, scale, noiseIntensity, color, rotation]
-  )
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
 
-  return (
-    <Canvas dpr={[1, 2]} frameloop='always'>
-      <SilkPlane ref={meshRef} uniforms={uniforms} />
-    </Canvas>
-  )
+    // DPR up to 2 keeps the per-pixel grain as fine as before on retina screens
+    const renderer = new Renderer({
+      dpr: Math.min(window.devicePixelRatio || 1, 2),
+      alpha: false,
+      antialias: false
+    })
+    const gl = renderer.gl
+    gl.canvas.style.display = 'block'
+    el.appendChild(gl.canvas)
+
+    const program = new Program(gl, {
+      vertex: vertexShader,
+      fragment: fragmentShader,
+      uniforms: {
+        uSpeed: { value: speed },
+        uScale: { value: scale },
+        uNoiseIntensity: { value: noiseIntensity },
+        uColor: { value: hexToNormalizedRGB(color) },
+        uRotation: { value: rotation },
+        uTime: { value: 0 }
+      }
+    })
+    const scene = new Transform()
+    new Mesh(gl, { geometry: new Triangle(gl), program }).setParent(scene)
+
+    const loop = createRenderLoop(el, seconds => {
+      // Matches the old r3f timing: uTime advanced by 0.1 * delta per frame
+      program.uniforms.uTime.value = 0.1 * seconds
+      renderer.render({ scene })
+    })
+
+    const resize = (): void => {
+      renderer.setSize(el.clientWidth, el.clientHeight)
+      loop.invalidate()
+    }
+    resize()
+    const ro = new ResizeObserver(resize)
+    ro.observe(el)
+
+    return () => {
+      loop.destroy()
+      ro.disconnect()
+      if (gl.canvas.parentElement === el) el.removeChild(gl.canvas)
+      gl.getExtension('WEBGL_lose_context')?.loseContext()
+    }
+  }, [speed, scale, color, noiseIntensity, rotation])
+
+  return <div ref={ref} aria-hidden='true' className='h-full w-full' />
 }
-
-export default Silk
