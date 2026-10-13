@@ -6,8 +6,8 @@ import { FadeIn, ScaleUnblur } from '@/components/ui/motion-primitives'
 import { PortraitMorph } from './portrait-morph'
 import RotatingText from '../ui/rotating-text'
 
-const PORTRAIT_SRC = '/josh.webp'
-const PORTRAIT_HOVER_SRC = '/josh_wave.webp'
+const PORTRAIT_SRC = '/sepehr.webp'
+const PORTRAIT_HOVER_SRC = '/sepehr-wave.webp'
 
 export function Hero(): ReactNode {
   return (
@@ -66,7 +66,7 @@ export function Hero(): ReactNode {
                 <PortraitMorph
                   srcA={PORTRAIT_SRC}
                   srcB={PORTRAIT_HOVER_SRC}
-                  alt='Josh portrait'
+                  alt='Illustrated portrait of Sepehr Gorgini'
                 />
               </div>
             </div>

@@ -1,7 +1,7 @@
 <!--
   GitHub profile README
   ────────────────────
-  1. Create a public repo named exactly like your username: sepehrgr7/sepehrgr7
+  1. Create a public repo named exactly like your username: sepehrgr/sepehrgr
   2. Add this file as README.md in that repo (root)
   3. Replace LINKEDIN_URL and X_URL below with your real profiles
   4. Optional: enable GitHub Profile README in repo settings (auto if name matches)
@@ -26,7 +26,7 @@ I craft interfaces that balance **clarity**, **performance**, and **polish** —
 
 [![Portfolio](https://img.shields.io/badge/Portfolio-sepehrgr.dev-0a0a0a?style=for-the-badge&logo=safari&logoColor=white)](https://sepehrgr.dev)
 [![Email](https://img.shields.io/badge/Email-contact%40sepehrgr.dev-EA4335?style=for-the-badge&logo=gmail&logoColor=white)](mailto:contact@sepehrgr.dev)
-[![GitHub](https://img.shields.io/badge/GitHub-sepehrgr7-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/sepehrgr7)
+[![GitHub](https://img.shields.io/badge/GitHub-sepehrgr-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/sepehrgr)
 
   <!-- Replace hrefs when you have real profiles -->
 
@@ -128,17 +128,17 @@ Currently building as a **Frontend Engineer at Petro Tejarat Kasra**, and freela
 <div align="center">
   <img
     height="160"
-    src="https://github-readme-stats.vercel.app/api?username=sepehrgr7&show_icons=true&theme=dark&hide_border=true&bg_color=0a0a0a&title_color=ffffff&icon_color=61DAFB&text_color=c9c9c9&ring_color=61DAFB"
+    src="https://github-readme-stats.vercel.app/api?username=sepehrgr&show_icons=true&theme=dark&hide_border=true&bg_color=0a0a0a&title_color=ffffff&icon_color=61DAFB&text_color=c9c9c9&ring_color=61DAFB"
     alt="Sepehr's GitHub stats"
   />
   <img
     height="160"
-    src="https://github-readme-stats.vercel.app/api/top-langs/?username=sepehrgr7&layout=compact&theme=dark&hide_border=true&bg_color=0a0a0a&title_color=ffffff&text_color=c9c9c9"
+    src="https://github-readme-stats.vercel.app/api/top-langs/?username=sepehrgr&layout=compact&theme=dark&hide_border=true&bg_color=0a0a0a&title_color=ffffff&text_color=c9c9c9"
     alt="Top languages"
   />
   <br />
   <img
-    src="https://streak-stats.demolab.com?user=sepehrgr7&theme=dark&hide_border=true&background=0a0a0a&ring=61DAFB&fire=61DAFB&currStreakLabel=ffffff"
+    src="https://streak-stats.demolab.com?user=sepehrgr&theme=dark&hide_border=true&background=0a0a0a&ring=61DAFB&fire=61DAFB&currStreakLabel=ffffff"
     alt="GitHub streak"
   />
 </div>
