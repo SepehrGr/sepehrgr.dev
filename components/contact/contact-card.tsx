@@ -93,27 +93,27 @@ export function ContactCard(): ReactNode {
                   <div className='flex items-center gap-3'>
                     <SocialIcon
                       href='https://github.com/sepehrgr7'
-                      label='Github'
+                      label='GitHub'
                       lucideIcon={Github}
                       index={0}
                     />
                     <SocialIcon
-                      href='https://www.linkedin.com'
+                      href='https://www.linkedin.com/in/Sepehrgr'
                       label='LinkedIn'
                       imageSrc='/linkedin.svg'
                       index={1}
                     />
                     <SocialIcon
-                      href='https://x.com'
-                      label='X'
-                      imageSrc='/x.svg'
+                      href='https://t.me/sepehrgr7'
+                      label='Telegram'
+                      imageSrc='/telegram.svg'
                       index={2}
                     />
                   </div>
                 </motion.div>
                 <div className='flex flex-col items-center gap-1 text-center'>
                   <p className='text-foreground/75 text-[13px] tracking-tight'>
-                    2026 &copy; Sepehr Gorgini
+                    &copy; 2026 Sepehr Gorgini
                   </p>
                 </div>
               </div>
@@ -154,7 +154,7 @@ function SocialIcon({
     >
       <Link
         href={href}
-        aria-label={label}
+        aria-label={isExternal ? `${label} (opens in new tab)` : label}
         className='border-foreground/8 hover:border-foreground/15 focus-ring bg-background text-foreground inline-flex h-11 w-11 items-center justify-center rounded-xl border transition-colors'
         {...externalProps}
       >
@@ -176,7 +176,7 @@ function SocialIcon({
               width={16}
               height={16}
               aria-hidden='true'
-              className='max-h-5 max-w-5 object-contain dark:invert'
+              className='h-auto max-h-5 w-auto max-w-5 object-contain dark:invert'
             />
           ) : null}
         </motion.span>

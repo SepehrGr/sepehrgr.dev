@@ -2,11 +2,10 @@ import type { Metadata } from 'next'
 
 export const siteConfig = {
   name: 'Sepehr Gorgini',
+  title: 'Sepehr Gorgini — Frontend Engineer',
   description:
     'Frontend developer specializing in React, Next.js, and TypeScript. Building modern, accessible web experiences.',
   url: 'https://sepehrgr.dev',
-  ogImage: '/og-image.png',
-  creator: '@sepehrgr',
   authors: [
     {
       name: 'Sepehr Gorgini',
@@ -31,13 +30,13 @@ export const siteConfig = {
 export const baseMetadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: siteConfig.name,
+    default: siteConfig.title,
     template: `%s | ${siteConfig.name}`
   },
   description: siteConfig.description,
   keywords: [...siteConfig.keywords],
   authors: [...siteConfig.authors],
-  creator: siteConfig.creator,
+  creator: siteConfig.name,
   publisher: siteConfig.name,
   robots: {
     index: true,
@@ -57,29 +56,16 @@ export const baseMetadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: siteConfig.url,
-    title: siteConfig.name,
+    title: siteConfig.title,
     description: siteConfig.description,
-    siteName: siteConfig.name,
-    images: [
-      {
-        url: siteConfig.ogImage,
-        width: 1200,
-        height: 630,
-        alt: siteConfig.name
-      }
-    ]
+    siteName: siteConfig.name
   },
+  // og:image, icons and apple-touch-icon come from app/opengraph-image.tsx,
+  // app/icon.svg, app/favicon.ico and app/apple-icon.png (file conventions)
   twitter: {
     card: 'summary_large_image',
-    title: siteConfig.name,
-    description: siteConfig.description,
-    images: [siteConfig.ogImage],
-    creator: siteConfig.creator
-  },
-  icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon-16x16.png',
-    apple: '/apple-icon.png'
+    title: siteConfig.title,
+    description: siteConfig.description
   },
   manifest: '/site.webmanifest'
 }
@@ -88,41 +74,30 @@ export function createMetadata({
   title,
   description,
   path = '/',
-  image,
   noIndex = false
 }: {
   title?: string
   description?: string
   path?: string
-  image?: string
   noIndex?: boolean
 }): Metadata {
   const url = `${siteConfig.url}${path}`
-  const ogImage = image ?? siteConfig.ogImage
 
   return {
-    title,
+    // an explicit `title: undefined` would wipe the layout's default title
+    ...(title && { title }),
     description,
     alternates: {
       canonical: path
     },
     openGraph: {
-      title: title ?? siteConfig.name,
+      title: title ?? siteConfig.title,
       description: description ?? siteConfig.description,
-      url,
-      images: [
-        {
-          url: ogImage,
-          width: 1200,
-          height: 630,
-          alt: title ?? siteConfig.name
-        }
-      ]
+      url
     },
     twitter: {
-      title: title ?? siteConfig.name,
-      description: description ?? siteConfig.description,
-      images: [ogImage]
+      title: title ?? siteConfig.title,
+      description: description ?? siteConfig.description
     },
     ...(noIndex && {
       robots: {

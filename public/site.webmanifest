@@ -4,8 +4,8 @@
   "description": "Frontend developer specializing in React, Next.js, and TypeScript. Building modern, accessible web experiences.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#0066FF",
+  "background_color": "#f9f8f6",
+  "theme_color": "#f9f8f6",
   "icons": [
     {
       "src": "/icon-192.png",
@@ -16,12 +16,6 @@
       "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
-    },
-    {
-      "src": "/icon-maskable.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
     }
   ]
 }

@@ -71,8 +71,10 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 │   ├── page.tsx                     # Home page
 │   ├── robots.ts                    # Dynamic robots.txt
 │   ├── sitemap.ts                   # Dynamic sitemap
-│   ├── icon.svg                     # Favicon
-│   └── apple-icon.svg               # Apple touch icon
+│   ├── icon.svg                     # Favicon (source for the PNG icons)
+│   ├── favicon.ico                  # Legacy favicon
+│   ├── apple-icon.png               # Apple touch icon
+│   └── opengraph-image.tsx          # Generated Open Graph image
 ├── components/
 │   ├── about/
 │   │   ├── education.tsx            # Education list with bordered logo squares
@@ -106,10 +108,10 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 │   ├── metadata.ts                  # SEO metadata utilities
 │   └── motion.tsx                   # Motion components & hooks
 └── public/
-    ├── josh.webp                    # Default portrait
-    ├── josh_wave.webp               # Hover portrait
+    ├── sepehr.webp                  # Default portrait
+    ├── sepehr-wave.webp             # Hover portrait
     ├── linkedin.svg                 # Social icon
-    ├── x.svg                        # Social icon
+    ├── telegram.svg                 # Social icon
     └── site.webmanifest             # PWA manifest
 ```
 
@@ -126,7 +128,7 @@ The default `siteConfig.url` is `https://example.com` — replace it with your p
 
 ### 2. Replace Brand & Portrait
 
-- Swap `public/josh.webp` and `public/josh_wave.webp` with your own default + hover portraits. Keep both files the same dimensions and aspect ratio for a clean morph.
+- Swap `public/sepehr.webp` and `public/sepehr-wave.webp` with your own default + hover portraits. Keep both files the same dimensions and aspect ratio for a clean morph.
 - Update headline, eyebrow, and subtitle copy in `components/hero/hero.tsx`.
 - Update social handles and email in `components/contact/contact-card.tsx` and `components/contact/contact-card-ctas.tsx`.
 
@@ -147,9 +149,8 @@ Edit the project array in `components/projects/projects.tsx`. Each entry include
 ### 5. Replace Icons
 
 Replace the following files with your brand assets:
-- `app/icon.svg` — Favicon (32x32)
-- `app/apple-icon.svg` — Apple touch icon (180x180)
-- `public/og-image.png` — Open Graph image (1200x630)
+- `app/icon.svg` — Favicon; `app/favicon.ico`, `app/apple-icon.png` (180x180) and `public/icon-192.png` / `icon-512.png` are rendered from it
+- `app/opengraph-image.tsx` — Open Graph image (1200x630), generated at build time
 
 ### 6. Tune the Shader
 
