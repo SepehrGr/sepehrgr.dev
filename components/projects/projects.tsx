@@ -35,28 +35,14 @@ function StackList({ stack }: { stack: string[] }): ReactNode {
   )
 }
 
-function CodeLink({
-  project,
-  className = '',
-}: {
-  project: Project
-  className?: string
-}): ReactNode {
-  // no public repo: say why rather than leave a gap
-  if (!project.repoUrl)
-    return (
-      <span
-        className={`text-foreground/60 text-sm tracking-tight ${className}`}
-      >
-        Client work
-      </span>
-    )
+function CodeLink({ project }: { project: Project }): ReactNode {
+  if (!project.repoUrl) return null
   return (
     <a
       href={project.repoUrl}
       {...NEW_TAB}
       aria-label={`${project.name} source code (opens in new tab)`}
-      className={`focus-ring text-foreground/75 hover:text-foreground inline-flex items-center gap-1.5 rounded-md text-sm font-medium transition-colors ${className}`}
+      className='focus-ring border-foreground/15 text-foreground hover:bg-foreground/6 inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-sm font-medium transition-colors'
     >
       <Github className='h-4 w-4' aria-hidden='true' />
       Code
@@ -69,9 +55,9 @@ function VisitButton({ project }: { project: Project }): ReactNode {
     <a
       href={project.liveUrl}
       {...NEW_TAB}
-      className='focus-ring bg-foreground text-background inline-flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-medium'
+      className='focus-ring border-foreground/15 text-foreground hover:bg-foreground/6 inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-sm font-medium transition-colors'
     >
-      Visit site
+      Visit project
       <ArrowUpRight className='h-4 w-4' aria-hidden='true' />
       <span className='sr-only'> (opens in new tab)</span>
     </a>
@@ -80,7 +66,8 @@ function VisitButton({ project }: { project: Project }): ReactNode {
 
 /**
  * Homepage: an index of projects, one row each, with every fact readable at
- * rest. Hovering a row (or focusing it) floats its screenshot above the row.
+ * rest. Hovering a row tints it and floats its screenshot above the row;
+ * only the Visit project button links to the site.
  */
 export function ProjectIndex(): ReactNode {
   const listRef = useRef<HTMLDivElement>(null)
@@ -123,10 +110,7 @@ export function ProjectIndex(): ReactNode {
   }
 
   return (
-    <section
-      className='relative my-12 w-full sm:my-20'
-      aria-labelledby='projects-heading'
-    >
+    <section className='relative w-full' aria-labelledby='projects-heading'>
       <div className='mx-auto w-full max-w-300 px-6 sm:px-10'>
         <FadeIn className='mb-10 flex flex-col gap-4 sm:mb-14'>
           <h2
@@ -169,20 +153,11 @@ export function ProjectIndex(): ReactNode {
                   }}
                 />
                 {/* One column template for every row, so name, summary and
-                    meta line up down the list whether or not a row has a
-                    Code link; everything shares the row's centre line. */}
+                    meta line up down the list; everything shares the row's
+                    centre line. */}
                 <div className='relative grid gap-y-4 py-7 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)_19rem] lg:items-center lg:gap-x-10 lg:py-9'>
                   <h3 className='text-foreground text-[2rem] leading-none font-semibold tracking-tight transition-transform duration-500 ease-out group-hover:translate-x-2 md:text-[2.75rem] lg:text-[2.5rem] xl:text-[2.75rem]'>
-                    <a
-                      href={p.liveUrl}
-                      {...NEW_TAB}
-                      className='focus-ring rounded-md after:absolute after:inset-0 after:content-[""]'
-                    >
-                      {p.name}
-                      <span className='sr-only'>
-                        , {domainOf(p.liveUrl)} (opens in new tab)
-                      </span>
-                    </a>
+                    {p.name}
                   </h3>
                   <div className='flex flex-col gap-3'>
                     <p className='text-foreground/75 text-[17px] leading-snug tracking-tight md:text-[19px]'>
@@ -190,20 +165,22 @@ export function ProjectIndex(): ReactNode {
                     </p>
                     <StackList stack={p.stack} />
                   </div>
-                  {/* the row links to the live site; show where it goes */}
-                  <div className='flex flex-col gap-2'>
-                    <span
-                      aria-hidden='true'
-                      className='text-foreground inline-flex items-center gap-1.5 text-[15px] font-medium tracking-tight'
-                    >
-                      {domainOf(p.liveUrl)}
-                      <ArrowUpRight className='text-foreground/50 group-hover:text-foreground h-4 w-4 transition-all duration-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5' />
+                  <div className='flex flex-col items-start gap-3'>
+                    <span className='text-foreground/70 text-sm tracking-tight'>
+                      {p.year}
+                      {p.repoUrl ? null : ' · Client work'}
                     </span>
                     <div className='flex items-center gap-3'>
-                      <span className='text-foreground/70 text-sm tracking-tight'>
-                        {p.role} · {p.year}
-                      </span>
-                      <CodeLink project={p} className='relative z-10' />
+                      <a
+                        href={p.liveUrl}
+                        {...NEW_TAB}
+                        aria-label={`Visit ${p.name} (opens in new tab)`}
+                        className='focus-ring border-foreground/15 text-foreground hover:bg-foreground/6 inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-sm font-medium transition-colors'
+                      >
+                        Visit project
+                        <ArrowUpRight className='h-4 w-4' aria-hidden='true' />
+                      </a>
+                      <CodeLink project={p} />
                     </div>
                   </div>
                 </div>
@@ -331,9 +308,12 @@ export function ProjectWindows(): ReactNode {
                   <dt className='text-foreground/60'>Stack</dt>
                   <dd className='text-foreground'>{p.stack.join(' · ')}</dd>
                   <dt className='text-foreground/60'>Year</dt>
-                  <dd className='text-foreground'>{p.year}</dd>
+                  <dd className='text-foreground'>
+                    {p.year}
+                    {p.repoUrl ? null : ' · Client work'}
+                  </dd>
                 </dl>
-                <div className='mt-8 flex items-center gap-5'>
+                <div className='mt-8 flex items-center gap-3'>
                   <VisitButton project={p} />
                   <CodeLink project={p} />
                 </div>
