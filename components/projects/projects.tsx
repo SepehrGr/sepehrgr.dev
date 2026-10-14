@@ -1,438 +1,333 @@
 'use client'
 
-import {
-  ArrowRight,
-  Bot,
-  Compass,
-  ExternalLink,
-  Layers,
-  LineChart,
-  Sparkles,
-  Wand2,
-} from 'lucide-react'
-import { AnimatePresence, motion, type MotionStyle } from 'motion/react'
-import { useState, type ComponentType, type ReactNode } from 'react'
+import { ArrowRight, ArrowUpRight, Github } from 'lucide-react'
+import { motion, useMotionValue, useSpring } from 'motion/react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRef, useState, type CSSProperties, type ReactNode } from 'react'
 
 import { FadeIn } from '@/components/ui/motion-primitives'
 import { useReducedMotion } from '@/lib/motion'
 
-type Project = {
-  id: string
-  icon: ComponentType<{ className?: string }>
-  name: string
-  category: string
-  title: string
-  description: string
-  role: string
-  year: string
-  duration: string
-  accent: string
-  imageRatio: number
-  image: string
-  imageAlt: string
-  projectUrl: string
-  highlights: string[]
-  tools: string[]
+import { PROJECTS, type Project } from './data'
+import styles from './projects.module.css'
+
+const EASE = [0.22, 1, 0.36, 1] as const
+const NEW_TAB = { target: '_blank', rel: 'noopener noreferrer' } as const
+const HOME_COUNT = 4
+
+function domainOf(url: string): string {
+  return new URL(url).hostname.replace(/^www\./, '')
 }
 
-// Keep project links and case-study details here so the home and projects pages
-// always stay in sync. Replace the sample destinations with published project URLs.
-const PROJECTS: Project[] = [
-  {
-    id: 'loom',
-    icon: Sparkles,
-    name: 'LOOM',
-    category: 'AI product design',
-    title: 'A writing companion that thinks alongside you.',
-    description:
-      'A focused writing surface where ideas, edits, and drafts coexist without the chat clutter.',
-    role: 'Design Engineer',
-    year: '2024',
-    duration: '8 weeks',
-    accent: '#f0a675',
-    imageRatio: 752 / 497,
-    image:
-      'https://cdn.dribbble.com/userupload/46128964/file/b92b9d268dd928642ca94bd49e32923a.jpg?resize=752x497&vertical=center',
-    imageAlt: 'Loom AI writing companion mockup',
-    projectUrl: 'https://www.loom.com',
-    highlights: [
-      'Designed a distraction-free drafting flow',
-      'Made AI suggestions feel editorial, not intrusive',
-      'Created a flexible system for notes and revisions',
-    ],
-    tools: ['Product design', 'Prototyping', 'React'],
-  },
-  {
-    id: 'atlas',
-    icon: Compass,
-    name: 'Atlas Studio',
-    category: 'Brand & web',
-    title: 'A two-week brand and product sprint for a creative studio.',
-    description:
-      'An identity, marketing site, and product surface designed to feel quietly confident at every touchpoint.',
-    role: 'Product & Brand Designer',
-    year: '2025',
-    duration: '2 weeks',
-    accent: '#b6a0f7',
-    imageRatio: 1024 / 768,
-    image:
-      'https://cdn.dribbble.com/userupload/24599416/file/original-1ae5075dcd129aebb16bdbca24b41ac7.png?resize=1024x768&vertical=center',
-    imageAlt: 'Atlas Studio brand and product sprint mockup',
-    projectUrl: 'https://dribbble.com',
-    highlights: [
-      'Established the visual direction in a single workshop',
-      'Built a modular landing-page system',
-      'Connected brand moments to product interactions',
-    ],
-    tools: ['Brand strategy', 'Web design', 'Framer'],
-  },
-  {
-    id: 'rhythm',
-    icon: LineChart,
-    name: 'Rhythm',
-    category: 'Analytics product',
-    title: 'Calm analytics for indie founders.',
-    description:
-      'A weekly digest that turns raw product data into a simple narrative worth reading with Sunday coffee.',
-    role: 'Founder & Designer',
-    year: '2024',
-    duration: '12 weeks',
-    accent: '#6ec7b5',
-    imageRatio: 1024 / 768,
-    image:
-      'https://cdn.dribbble.com/userupload/47357856/file/75841fa59f32f05ca6c5ddf02d08dfe6.png?resize=1024x768&vertical=center',
-    imageAlt: 'Rhythm calm analytics mockup',
-    projectUrl: 'https://dribbble.com',
-    highlights: [
-      'Translated key metrics into a readable weekly story',
-      'Designed a low-noise dashboard for recurring review',
-      'Prioritized trends over one-off spikes',
-    ],
-    tools: ['Product strategy', 'Data visualisation', 'UI design'],
-  },
-  {
-    id: 'groove',
-    icon: Wand2,
-    name: 'Groove',
-    category: 'Service redesign',
-    title: 'A clearer path to the right music lesson.',
-    description:
-      'A redesigned booking experience that makes finding a teacher and choosing a time feel as natural as opening a calendar.',
-    role: 'Lead Designer',
-    year: '2023',
-    duration: '10 weeks',
-    accent: '#f2c36f',
-    imageRatio: 1024 / 768,
-    image:
-      'https://cdn.dribbble.com/userupload/43955214/file/original-d4cde1de803e84b97d8892e3444c04b0.png?resize=1024x768&vertical=center',
-    imageAlt: 'Groove music school booking flow mockup',
-    projectUrl: 'https://dribbble.com',
-    highlights: [
-      'Simplified the lesson selection journey',
-      'Reduced friction around availability and scheduling',
-      'Created reusable patterns for the wider platform',
-    ],
-    tools: ['UX research', 'Service design', 'Design systems'],
-  },
-  {
-    id: 'fieldnote',
-    icon: Layers,
-    name: 'Fieldnote',
-    category: 'Research tool',
-    title: 'A research tool that gets teams out of their docs.',
-    description:
-      'A pocket-sized workspace for capturing quotes, tagging patterns, and synthesising what teams learn in the field.',
-    role: 'Design Engineer',
-    year: '2024',
-    duration: '6 weeks',
-    accent: '#77a8e8',
-    imageRatio: 1024 / 768,
-    image:
-      'https://cdn.dribbble.com/userupload/30310902/file/original-621e7fe47be9d11ee14544456c693bec.png?resize=1024x768&vertical=center',
-    imageAlt: 'Fieldnote research tool mockup',
-    projectUrl: 'https://dribbble.com',
-    highlights: [
-      'Made in-the-moment capture feel lightweight',
-      'Designed an approachable synthesis workflow',
-      'Kept the interface out of the research conversation',
-    ],
-    tools: ['UX design', 'Information architecture', 'React'],
-  },
-  {
-    id: 'talkback',
-    icon: Bot,
-    name: 'Talkback',
-    category: 'AI exploration',
-    title: 'A friendlier interface for talking to language models.',
-    description:
-      'An exploration of how AI chat can feel less like a terminal and more like a conversation with a curious friend.',
-    role: 'Independent Project',
-    year: '2025',
-    duration: '4 weeks',
-    accent: '#db8ca8',
-    imageRatio: 1024 / 768,
-    image:
-      'https://cdn.dribbble.com/userupload/16560717/file/original-c6f745d50302d66609bfe080f99f5396.png?resize=1024x768&vertical=center',
-    imageAlt: 'Talkback friendlier AI chat interface mockup',
-    projectUrl: 'https://dribbble.com',
-    highlights: [
-      'Explored softer, more human conversation patterns',
-      'Created clearer context and response states',
-      'Prototyped interaction details for long conversations',
-    ],
-    tools: ['Interaction design', 'Motion', 'Prototyping'],
-  },
-]
-
-export type ProjectsProps = {
-  withHeadline?: boolean
-  viewMoreVisible?: boolean
+function StackList({ stack }: { stack: string[] }): ReactNode {
+  return (
+    <ul className='flex flex-wrap gap-1.5' aria-label='Stack'>
+      {stack.map(item => (
+        <li
+          key={item}
+          className='border-foreground/12 text-foreground/75 rounded-md border px-2 py-0.5 text-[13px] tracking-tight'
+        >
+          {item}
+        </li>
+      ))}
+    </ul>
+  )
 }
 
-export function Projects({
-  withHeadline = false,
-  viewMoreVisible = false,
-}: ProjectsProps): ReactNode {
-  const items = viewMoreVisible ? PROJECTS.slice(0, 4) : PROJECTS
+function CodeLink({
+  project,
+  className = '',
+}: {
+  project: Project
+  className?: string
+}): ReactNode {
+  if (!project.repoUrl) return null
+  return (
+    <a
+      href={project.repoUrl}
+      {...NEW_TAB}
+      aria-label={`${project.name} source code (opens in new tab)`}
+      className={`focus-ring text-foreground/75 hover:text-foreground inline-flex items-center gap-1.5 rounded-md text-sm font-medium transition-colors ${className}`}
+    >
+      <Github className='h-4 w-4' aria-hidden='true' />
+      Code
+    </a>
+  )
+}
+
+function VisitButton({ project }: { project: Project }): ReactNode {
+  return (
+    <a
+      href={project.liveUrl}
+      {...NEW_TAB}
+      className='focus-ring bg-foreground text-background inline-flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-medium'
+    >
+      Visit site
+      <ArrowUpRight className='h-4 w-4' aria-hidden='true' />
+      <span className='sr-only'> (opens in new tab)</span>
+    </a>
+  )
+}
+
+/**
+ * Homepage: an index of projects, one row each, with every fact readable at
+ * rest. Hovering a row (or focusing it) floats its screenshot above the row.
+ */
+export function ProjectIndex(): ReactNode {
+  const listRef = useRef<HTMLDivElement>(null)
+  const [active, setActive] = useState<number | null>(null)
+  const reduced = useReducedMotion()
+  const x = useMotionValue(0)
+  const y = useMotionValue(0)
+  const tilt = useMotionValue(0)
+  const spring = { stiffness: 260, damping: 28, mass: 0.6 }
+  const sx = useSpring(x, spring)
+  const sy = useSpring(y, spring)
+  const rotate = useSpring(tilt, { stiffness: 180, damping: 18 })
+  const lastX = useRef(0)
+  const items = PROJECTS.slice(0, HOME_COUNT)
+
+  // x follows the cursor; y stays pinned to the hovered row's top edge (set on
+  // enter) so the preview never covers the row being read
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>): void => {
+    if (e.pointerType !== 'mouse') return
+    x.set(e.clientX - e.currentTarget.getBoundingClientRect().left)
+    // lean into the direction of travel
+    if (!reduced)
+      tilt.set(Math.max(-8, Math.min(8, (e.clientX - lastX.current) * 0.6)))
+    lastX.current = e.clientX
+  }
+
+  const onRowEnter = (e: React.PointerEvent<HTMLLIElement>, i: number) => {
+    if (e.pointerType !== 'mouse') return
+    y.set(e.currentTarget.offsetTop)
+    setActive(i)
+  }
+
+  // keyboard focus parks the preview above the row's right edge
+  const onRowFocus = (row: HTMLElement, i: number): void => {
+    const list = listRef.current
+    if (!list) return
+    x.set(list.clientWidth - 200)
+    y.set(row.offsetTop)
+    setActive(i)
+  }
 
   return (
     <section
-      className='relative w-full'
-      aria-labelledby={withHeadline ? 'projects-heading' : undefined}
+      className='relative my-12 w-full sm:my-20'
+      aria-labelledby='projects-heading'
     >
       <div className='mx-auto w-full max-w-300 px-6 sm:px-10'>
-        {withHeadline ? (
-          <FadeIn className='flex flex-col items-center gap-5 pt-12 pb-10 text-center sm:pt-20 sm:pb-14'>
-            <p className='text-foreground/50 text-xs font-medium tracking-[0.16em] uppercase'>
-              Selected work
-            </p>
-            <h2
-              id='projects-heading'
-              className='text-foreground font-serif text-[2.5rem] leading-[1.05] font-medium tracking-tight md:text-[3rem] lg:text-[3.5rem]'
-            >
-              Projects with room to explore
-            </h2>
-            <p className='text-foreground/65 max-w-[37ch] text-[18px] leading-[1.45] tracking-tight sm:text-[20px]'>
-              A selection of product, brand, and experimental work. Open a
-              project for the story behind it.
-            </p>
-          </FadeIn>
-        ) : null}
+        <FadeIn className='mb-10 flex flex-col gap-4 sm:mb-14'>
+          <h2
+            id='projects-heading'
+            className='text-foreground text-[2.5rem] leading-[1.05] font-semibold tracking-tight md:text-[3.25rem]'
+          >
+            Things I&rsquo;ve built
+          </h2>
+          <p className='text-foreground/70 max-w-[44ch] text-[18px] leading-[1.45] tracking-tight sm:text-[20px]'>
+            Freelance frontend work since 2022: products, sites and experiments
+            in React, Next.js and TypeScript.
+          </p>
+        </FadeIn>
 
-        <div className='grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-7 lg:grid-cols-12'>
-          {items.map((project, index) => (
-            <ProjectCard key={project.id} project={project} index={index} />
-          ))}
+        <div
+          ref={listRef}
+          onPointerMove={onPointerMove}
+          onPointerLeave={() => {
+            setActive(null)
+            tilt.set(0)
+          }}
+          className='relative'
+        >
+          <ul>
+            {items.map((p, i) => (
+              <li
+                key={p.id}
+                onPointerEnter={e => onRowEnter(e, i)}
+                onFocus={e => onRowFocus(e.currentTarget, i)}
+                onBlur={() => setActive(null)}
+                className='group border-foreground/10 relative border-t last:border-b'
+                style={{ '--accent': p.accent } as CSSProperties}
+              >
+                <div
+                  aria-hidden='true'
+                  className='pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-focus-within:opacity-100 group-hover:opacity-100'
+                  style={{
+                    background:
+                      'linear-gradient(90deg, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%)',
+                  }}
+                />
+                {/* One column template for every row, so name, summary and
+                    meta line up down the list whether or not a row has a
+                    Code link; everything shares the row's centre line. */}
+                <div className='relative grid gap-y-4 py-7 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)_19rem] lg:items-center lg:gap-x-10 lg:py-9'>
+                  <h3 className='text-foreground text-[2rem] leading-none font-semibold tracking-tight transition-transform duration-500 ease-out group-hover:translate-x-2 md:text-[2.75rem] lg:text-[2.5rem] xl:text-[2.75rem]'>
+                    <a
+                      href={p.liveUrl}
+                      {...NEW_TAB}
+                      className='focus-ring rounded-md after:absolute after:inset-0 after:content-[""]'
+                    >
+                      {p.name}
+                      <span className='sr-only'> (opens in new tab)</span>
+                    </a>
+                  </h3>
+                  <div className='flex flex-col gap-3'>
+                    <p className='text-foreground/75 text-[17px] leading-snug tracking-tight md:text-[19px]'>
+                      {p.summary}
+                    </p>
+                    <StackList stack={p.stack} />
+                  </div>
+                  <div className='grid grid-cols-[minmax(0,1fr)_4rem_1.25rem] items-center gap-4'>
+                    <span className='text-foreground/70 truncate text-sm tracking-tight'>
+                      {p.role} · {p.year}
+                    </span>
+                    <span>
+                      <CodeLink project={p} className='relative z-10' />
+                    </span>
+                    <ArrowUpRight
+                      className='text-foreground/50 group-hover:text-foreground h-5 w-5 transition-all duration-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5'
+                      aria-hidden='true'
+                    />
+                  </div>
+                </div>
+                {/* below lg there is no cursor to follow: the preview sits inline */}
+                <div className='border-foreground/8 relative mb-7 aspect-16/10 overflow-hidden rounded-2xl border lg:hidden'>
+                  <Image
+                    src={p.shot.src}
+                    alt={p.shot.alt}
+                    fill
+                    sizes='(min-width: 640px) 90vw, 100vw'
+                    className='object-cover object-top'
+                  />
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          <motion.div
+            aria-hidden='true'
+            className='pointer-events-none absolute top-0 left-0 z-20 hidden lg:block'
+            style={{ x: sx, y: sy, rotate }}
+          >
+            <motion.div
+              className='border-foreground/10 bg-background relative h-56 w-84 -translate-x-1/2 -translate-y-[calc(100%+1.25rem)] overflow-hidden rounded-2xl border p-1 shadow-[0_24px_48px_-16px_rgb(0_0_0/0.35)]'
+              initial={false}
+              animate={{
+                opacity: active === null ? 0 : 1,
+                scale: active === null ? 0.85 : 1,
+              }}
+              transition={{ duration: 0.35, ease: EASE }}
+            >
+              <div className='relative h-full w-full overflow-hidden rounded-xl'>
+                {items.map((p, i) => (
+                  <Image
+                    key={p.id}
+                    src={p.shot.src}
+                    alt=''
+                    fill
+                    sizes='336px'
+                    className='object-cover object-top transition-opacity duration-300'
+                    style={{ opacity: active === i ? 1 : 0 }}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
         </div>
 
-        {viewMoreVisible ? (
-          <div className='mt-12 flex justify-center sm:mt-16'>
-            <Link
-              href='/projects'
-              className='border-foreground/10 focus-ring group bg-background text-foreground hover:bg-foreground/5 inline-flex cursor-pointer items-center gap-2 rounded-xl border px-5 py-2.5 text-sm font-medium transition-colors'
-            >
-              Explore all projects
-              <ArrowRight
-                className='h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5'
-                aria-hidden='true'
-              />
-            </Link>
-          </div>
-        ) : null}
+        <div className='mt-12 flex sm:mt-14'>
+          <Link
+            href='/projects'
+            className='border-foreground/10 focus-ring group bg-background text-foreground hover:bg-foreground/5 inline-flex cursor-pointer items-center gap-2 rounded-xl border px-5 py-2.5 text-sm font-medium transition-colors'
+          >
+            Explore all projects
+            <ArrowRight
+              className='h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5'
+              aria-hidden='true'
+            />
+          </Link>
+        </div>
       </div>
     </section>
   )
 }
 
-function ProjectCard({
-  project,
-  index,
-}: {
-  project: Project
-  index: number
-}): ReactNode {
-  const Icon = project.icon
-  const [isHovered, setIsHovered] = useState(false)
-  const [isPinned, setIsPinned] = useState(false)
-  const prefersReducedMotion = useReducedMotion()
-  const isExpanded = isHovered || isPinned
-
-  const isTouchLayout = (): boolean =>
-    window.matchMedia('(hover: none), (pointer: coarse)').matches
-
+/**
+ * /projects: each project in a minimal browser window; hovering pans the
+ * full-page screenshot inside it, facts sit beside the frame.
+ */
+export function ProjectWindows(): ReactNode {
   return (
-    <FadeIn
-      delay={Math.min(index * 0.06, 0.3)}
-      className={
-        index % 4 === 0 || index % 4 === 3 ? 'lg:col-span-7' : 'lg:col-span-5'
-      }
-    >
-      <motion.article
-        layout
-        onHoverStart={event => {
-          if (event.pointerType === 'mouse') setIsHovered(true)
-        }}
-        onHoverEnd={event => {
-          if (event.pointerType === 'mouse') setIsHovered(false)
-        }}
-        onClick={event => {
-          if (!isTouchLayout()) return
-          if ((event.target as HTMLElement).closest('a')) return
-          setIsPinned(value => !value)
-        }}
-        onKeyDown={event => {
-          if (!isTouchLayout()) return
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault()
-            setIsPinned(value => !value)
-          }
-        }}
-        tabIndex={0}
-        aria-label={`${project.name}: activate to ${isPinned ? 'close' : 'keep open'} project details`}
-        transition={{
-          duration: prefersReducedMotion ? 0 : 0.45,
-          ease: [0.22, 1, 0.36, 1],
-        }}
-        className={`project-card border-foreground/8 bg-background group relative overflow-hidden rounded-3xl border p-3 sm:p-3.5 ${isExpanded ? 'is-expanded' : ''}`}
-        style={{ '--project-accent': project.accent } as MotionStyle}
-      >
-        <div>
-          <div className='flex items-center justify-between gap-3 px-1 pt-2'>
-            <div className='flex min-w-0 items-center gap-2.5'>
-              <span className='border-foreground/10 bg-background inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border'>
-                <Icon
-                  className='text-foreground h-3.5 w-3.5'
-                  aria-hidden='true'
-                />
-              </span>
-              <div className='min-w-0'>
-                <span className='text-foreground block truncate text-sm font-medium tracking-tight'>
-                  {project.name}
-                </span>
-                <span className='text-foreground/45 block text-[11px] tracking-tight'>
-                  {project.category}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div
-            className='project-card__image ring-foreground/5 bg-foreground/5 relative mt-4 w-full overflow-hidden rounded-2xl ring-1'
-            style={{ aspectRatio: project.imageRatio }}
-          >
-            <div className='project-card__image-inner'>
-              <Image
-                src={project.image}
-                alt={project.imageAlt}
-                fill
-                sizes='(min-width: 1024px) 540px, (min-width: 768px) 45vw, 100vw'
-                className='object-cover'
-                priority={index < 2}
-              />
-            </div>
-          </div>
-
-          <div className='flex flex-col gap-2.5 px-1 pt-4 pb-2'>
-            <h3 className='text-foreground text-[20px] leading-[1.17] font-medium tracking-tight sm:text-[22px]'>
-              {project.title}
-            </h3>
-            <p className='text-foreground/65 text-[14px] leading-normal tracking-tight sm:text-[15px]'>
-              {project.description}
-            </p>
-          </div>
-
-          <dl className='border-foreground/8 mx-1 grid grid-cols-3 border-t pt-3 pb-1 text-[11px] tracking-tight'>
-            <div>
-              <dt className='text-foreground/45'>Role</dt>
-              <dd className='text-foreground/75 mt-1 font-medium'>
-                {project.role}
-              </dd>
-            </div>
-            <div>
-              <dt className='text-foreground/45'>Year</dt>
-              <dd className='text-foreground/75 mt-1 font-medium'>
-                {project.year}
-              </dd>
-            </div>
-            <div>
-              <dt className='text-foreground/45'>Timeline</dt>
-              <dd className='text-foreground/75 mt-1 font-medium'>
-                {project.duration}
-              </dd>
-            </div>
-          </dl>
-        </div>
-
-        <AnimatePresence initial={false}>
-          {isExpanded ? (
-            <motion.div
-              key='details'
-              initial={
-                prefersReducedMotion ? false : { height: 0, opacity: 0, y: -12 }
-              }
-              animate={{ height: 'auto', opacity: 1, y: 0 }}
-              {...(prefersReducedMotion
-                ? {}
-                : { exit: { height: 0, opacity: 0, y: -12 } })}
-              transition={{
-                duration: prefersReducedMotion ? 0 : 0.38,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-              className='project-card__details'
+    <section className='relative w-full' aria-label='Projects'>
+      <div className='mx-auto flex w-full max-w-300 flex-col gap-20 px-6 sm:px-10 md:gap-28'>
+        {PROJECTS.map((p, i) => (
+          <FadeIn key={p.id}>
+            <article
+              className='grid items-center gap-8 md:grid-cols-12 md:gap-12'
+              style={{ '--accent': p.accent } as CSSProperties}
             >
-              <div className='border-foreground/8 mx-1 mt-3 border-t pt-5 pb-1'>
-                <div className='grid gap-6 sm:grid-cols-[1.15fr_0.85fr]'>
-                  <div>
-                    <p className='text-foreground/45 text-[11px] font-medium tracking-[0.14em] uppercase'>
-                      Project focus
-                    </p>
-                    <ul className='mt-3 space-y-2'>
-                      {project.highlights.map(highlight => (
-                        <li
-                          key={highlight}
-                          className='text-foreground/70 flex gap-2 text-[13px] leading-snug'
-                        >
-                          <span className='bg-foreground/45 mt-1.5 h-1 w-1 shrink-0 rounded-full' />
-                          {highlight}
-                        </li>
-                      ))}
-                    </ul>
+              <a
+                href={p.liveUrl}
+                {...NEW_TAB}
+                aria-label={`Visit ${p.name} (opens in new tab)`}
+                className={`${styles.frame} focus-ring group block rounded-[1.25rem] md:col-span-7 ${i % 2 ? 'md:order-2' : ''}`}
+              >
+                <div className='border-foreground/10 bg-background overflow-hidden rounded-[1.25rem] border shadow-[0_1px_2px_rgb(0_0_0/0.05),0_24px_48px_-24px_color-mix(in_srgb,var(--accent)_55%,transparent)] transition-shadow duration-500 group-hover:shadow-[0_1px_2px_rgb(0_0_0/0.05),0_32px_64px_-24px_color-mix(in_srgb,var(--accent)_80%,transparent)]'>
+                  <div className='border-foreground/8 flex items-center gap-1.5 border-b px-4 py-3'>
+                    {[0, 1, 2].map(d => (
+                      <span
+                        key={d}
+                        className='bg-foreground/15 h-2.5 w-2.5 rounded-full'
+                      />
+                    ))}
+                    <span className='bg-foreground/5 text-foreground/65 mx-auto rounded-md px-3 py-1 text-xs tracking-tight'>
+                      {domainOf(p.liveUrl)}
+                    </span>
+                    <span className='w-10' />
                   </div>
-                  <div>
-                    <p className='text-foreground/45 text-[11px] font-medium tracking-[0.14em] uppercase'>
-                      Contribution
-                    </p>
-                    <div className='mt-3 flex flex-wrap gap-1.5'>
-                      {project.tools.map(tool => (
-                        <span
-                          key={tool}
-                          className='border-foreground/10 bg-foreground/3 text-foreground/65 rounded-md border px-2 py-1 text-[11px]'
-                        >
-                          {tool}
-                        </span>
-                      ))}
-                    </div>
+                  <div
+                    className={`${styles.viewport} relative aspect-16/10 overflow-hidden`}
+                  >
+                    <Image
+                      src={p.shot.src}
+                      alt={p.shot.alt}
+                      width={1024}
+                      height={p.shot.height}
+                      sizes='(min-width: 768px) 640px, 100vw'
+                      priority={i === 0}
+                      className={`${styles.shot} block h-auto w-full`}
+                    />
                   </div>
                 </div>
-                <a
-                  href={project.projectUrl}
-                  target='_blank'
-                  rel='noreferrer'
-                  className='border-foreground/10 focus-ring group/link text-foreground hover:bg-foreground hover:text-background mt-6 inline-flex items-center gap-2 rounded-xl border px-3.5 py-2 text-xs font-medium transition-colors'
-                >
-                  Visit project
-                  <ExternalLink
-                    className='h-3.5 w-3.5 transition-transform duration-300 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5'
-                    aria-hidden='true'
-                  />
-                </a>
+              </a>
+
+              <div className='flex flex-col md:col-span-5'>
+                <h2 className='text-foreground text-[2rem] leading-none font-semibold tracking-tight md:text-[2.5rem]'>
+                  {p.name}
+                </h2>
+                <p className='text-foreground/75 mt-4 max-w-[34ch] text-[18px] leading-snug tracking-tight'>
+                  {p.summary}
+                </p>
+                <dl className='border-foreground/10 mt-7 grid grid-cols-[5rem_1fr] gap-y-3 border-t pt-5 text-[15px] tracking-tight'>
+                  <dt className='text-foreground/60'>Role</dt>
+                  <dd className='text-foreground'>{p.role}</dd>
+                  <dt className='text-foreground/60'>Stack</dt>
+                  <dd className='text-foreground'>{p.stack.join(' · ')}</dd>
+                  <dt className='text-foreground/60'>Year</dt>
+                  <dd className='text-foreground'>{p.year}</dd>
+                </dl>
+                <div className='mt-8 flex items-center gap-5'>
+                  <VisitButton project={p} />
+                  <CodeLink project={p} />
+                </div>
               </div>
-            </motion.div>
-          ) : null}
-        </AnimatePresence>
-      </motion.article>
-    </FadeIn>
+            </article>
+          </FadeIn>
+        ))}
+      </div>
+    </section>
   )
 }
