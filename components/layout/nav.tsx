@@ -118,7 +118,6 @@ export function Nav(): ReactNode {
   const listRef = useRef<HTMLUListElement>(null)
   const itemRefs = useRef<Array<HTMLLIElement | null>>([])
   const [pillRect, setPillRect] = useState<{
-    index: number
     x: number
     width: number
   } | null>(null)
@@ -137,7 +136,6 @@ export function Nav(): ReactNode {
     const listRect = list.getBoundingClientRect()
     const itemRect = activeEl.getBoundingClientRect()
     setPillRect({
-      index: activeIndex,
       x: itemRect.left - listRect.left,
       width: itemRect.width,
     })
@@ -153,7 +151,8 @@ export function Nav(): ReactNode {
     <nav aria-label='Primary' className='hidden md:block'>
       <div className='border-foreground/8 bg-background/30 flex items-center gap-1 rounded-full border p-1.5 shadow-sm backdrop-blur'>
         <ul ref={listRef} className='relative flex items-center gap-1'>
-          {pillRect?.index === activeIndex && (
+          {/* keep mounted across route changes so the spring can run */}
+          {pillRect && activeIndex >= 0 && (
             <motion.span
               aria-hidden='true'
               initial={false}
