@@ -1,7 +1,8 @@
 // PLACEHOLDER projects. Every entry below is sample content and must be
 // replaced with real work before this ships:
 //   name, summary, role, year, stack — the facts shown on every row/window
-//   liveUrl / repoUrl              — repoUrl is optional (omit if private)
+//   liveUrl / repoUrl              — omit repoUrl for client work; the
+//                                    Code link then reads "Client work"
 //   shot                           — a full-page screenshot, 1024px wide;
 //                                    height = its pixel height. The top is
 //                                    the homepage preview, the whole page

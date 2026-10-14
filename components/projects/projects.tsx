@@ -42,7 +42,15 @@ function CodeLink({
   project: Project
   className?: string
 }): ReactNode {
-  if (!project.repoUrl) return null
+  // no public repo: say why rather than leave a gap
+  if (!project.repoUrl)
+    return (
+      <span
+        className={`text-foreground/60 text-sm tracking-tight ${className}`}
+      >
+        Client work
+      </span>
+    )
   return (
     <a
       href={project.repoUrl}
@@ -171,7 +179,9 @@ export function ProjectIndex(): ReactNode {
                       className='focus-ring rounded-md after:absolute after:inset-0 after:content-[""]'
                     >
                       {p.name}
-                      <span className='sr-only'> (opens in new tab)</span>
+                      <span className='sr-only'>
+                        , {domainOf(p.liveUrl)} (opens in new tab)
+                      </span>
                     </a>
                   </h3>
                   <div className='flex flex-col gap-3'>
@@ -180,17 +190,21 @@ export function ProjectIndex(): ReactNode {
                     </p>
                     <StackList stack={p.stack} />
                   </div>
-                  <div className='grid grid-cols-[minmax(0,1fr)_4rem_1.25rem] items-center gap-4'>
-                    <span className='text-foreground/70 truncate text-sm tracking-tight'>
-                      {p.role} · {p.year}
-                    </span>
-                    <span>
-                      <CodeLink project={p} className='relative z-10' />
-                    </span>
-                    <ArrowUpRight
-                      className='text-foreground/50 group-hover:text-foreground h-5 w-5 transition-all duration-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5'
+                  {/* the row links to the live site; show where it goes */}
+                  <div className='flex flex-col gap-2'>
+                    <span
                       aria-hidden='true'
-                    />
+                      className='text-foreground inline-flex items-center gap-1.5 text-[15px] font-medium tracking-tight'
+                    >
+                      {domainOf(p.liveUrl)}
+                      <ArrowUpRight className='text-foreground/50 group-hover:text-foreground h-4 w-4 transition-all duration-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5' />
+                    </span>
+                    <div className='flex items-center gap-3'>
+                      <span className='text-foreground/70 text-sm tracking-tight'>
+                        {p.role} · {p.year}
+                      </span>
+                      <CodeLink project={p} className='relative z-10' />
+                    </div>
                   </div>
                 </div>
                 {/* below lg there is no cursor to follow: the preview sits inline */}
