@@ -44,9 +44,9 @@ export function Experience(): ReactNode {
 
   return (
     <div className='flex flex-col gap-3'>
-      <h3 className='text-foreground text-[18px] font-semibold tracking-tight'>
+      <h2 className='text-foreground text-[18px] font-semibold tracking-tight'>
         Experience
-      </h3>
+      </h2>
       <div
         className={`border-foreground/5 bg-foreground/2 dark:bg-foreground/5 relative overflow-hidden rounded-4xl border px-2 pt-2 sm:px-4 sm:pt-4 ${
           collapsed ? 'pb-0' : 'pb-2 sm:pb-4'
@@ -76,7 +76,7 @@ export function Experience(): ReactNode {
                   <span className='text-foreground/65 mt-0.5 text-[14px] tracking-tight sm:text-[15px]'>
                     {entry.role}
                     <span className='text-foreground/30 mx-2'>•</span>
-                    <span className='text-foreground/55'>{entry.period}</span>
+                    <span className='text-foreground/60'>{entry.period}</span>
                   </span>
                 </div>
               </li>

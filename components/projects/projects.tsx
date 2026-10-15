@@ -291,7 +291,7 @@ export function ProjectWindows(): ReactNode {
                         className='bg-foreground/15 h-2.5 w-2.5 rounded-full'
                       />
                     ))}
-                    <span className='bg-foreground/5 text-foreground/65 mx-auto rounded-md px-3 py-1 text-xs tracking-tight'>
+                    <span className='bg-foreground/5 text-foreground/65 mx-auto rounded-md px-3 py-1 text-[13px] tracking-tight'>
                       {domainOf(p.liveUrl)}
                     </span>
                     <span className='w-10' />
