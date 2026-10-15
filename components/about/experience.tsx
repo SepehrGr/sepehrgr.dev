@@ -39,6 +39,8 @@ export function Experience(): ReactNode {
     Math.floor(COLLAPSED_COUNT) * ROW_GAP +
     (COLLAPSED_COUNT % 1) * ROW_HEIGHT
   const hiddenCount = ENTRIES.length - Math.floor(COLLAPSED_COUNT)
+  // with nothing to hide, show the list as is: no clipped height, no fade
+  const collapsed = hiddenCount > 0 && !open
 
   return (
     <div className='flex flex-col gap-3'>
@@ -47,14 +49,14 @@ export function Experience(): ReactNode {
       </h3>
       <div
         className={`border-foreground/5 bg-foreground/2 dark:bg-foreground/5 relative overflow-hidden rounded-4xl border px-2 pt-2 sm:px-4 sm:pt-4 ${
-          open ? 'pb-2 sm:pb-4' : 'pb-0'
+          collapsed ? 'pb-0' : 'pb-2 sm:pb-4'
         }`}
       >
         <motion.div
           className='relative'
           initial={false}
           animate={{
-            height: open ? 'auto' : collapsedHeight,
+            height: collapsed ? collapsedHeight : 'auto',
           }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           style={{ overflow: 'hidden' }}
@@ -83,7 +85,7 @@ export function Experience(): ReactNode {
         </motion.div>
 
         <AnimatePresence>
-          {!open && (
+          {collapsed && (
             <motion.div
               key='fade'
               initial={{ opacity: 0 }}
