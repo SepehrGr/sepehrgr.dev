@@ -34,7 +34,12 @@ export function useIsMounted(): boolean {
   )
 }
 
-export function ThemeToggle(): ReactNode {
+/**
+ * `reveal` animates the new theme in a circle from the button (a view
+ * transition). Mobile turns it off: Safari and Firefox drop backdrop-filter
+ * from the transition snapshot, so the blurred menu and top bar flash clear.
+ */
+export function ThemeToggle({ reveal = true }: { reveal?: boolean }): ReactNode {
   const mounted = useIsMounted()
   const { setTheme, resolvedTheme } = useTheme()
   const isDark = mounted && resolvedTheme === 'dark'
@@ -50,7 +55,7 @@ export function ThemeToggle(): ReactNode {
       typeof document !== 'undefined' &&
       typeof document.startViewTransition === 'function'
 
-    if (!supportsViewTransitions || prefersReducedMotion) {
+    if (!reveal || !supportsViewTransitions || prefersReducedMotion) {
       setTheme(next)
       return
     }
