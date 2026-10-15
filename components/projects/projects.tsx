@@ -229,7 +229,7 @@ export function ProjectIndex(): ReactNode {
           </motion.div>
         </div>
 
-        <div className='mt-12 flex sm:mt-14'>
+        <div className='mt-12 flex justify-center sm:mt-14'>
           <Link
             href='/projects'
             className='border-foreground/10 focus-ring group bg-background text-foreground hover:bg-foreground/5 inline-flex cursor-pointer items-center gap-2 rounded-xl border px-5 py-2.5 text-sm font-medium transition-colors'
