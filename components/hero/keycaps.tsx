@@ -175,10 +175,10 @@ function Key({ def, index, palette, font, pressed, flash, onPress }: { def: KeyD
 
 function Board({ keys, palette, font, pressed, copied, press }: { keys: KeyDef[]; palette: Palette; font: string; pressed: KeyId | null; copied: boolean; press: (id: KeyId, down: boolean) => void }): ReactNode {
   const board = useRef<THREE.Group>(null)
-  const reduced = useMemo(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches, [])
-  // tilt a little toward the cursor
+  // tilt a little toward the cursor; not on touch, where a finger drag means scroll
+  const still = useMemo(() => window.matchMedia('(prefers-reduced-motion: reduce), (hover: none)').matches, [])
   useFrame(({ pointer }, dt) => {
-    if (!board.current || reduced) return
+    if (!board.current || still) return
     const r = board.current.rotation
     r.x += (pointer.y * 0.12 - r.x) * Math.min(1, dt * 4)
     r.y += (pointer.x * 0.2 - r.y) * Math.min(1, dt * 4)
@@ -260,6 +260,11 @@ export function Keycaps(): ReactNode {
     }
   }
 
+  const release = (): void => {
+    pressedRef.current = null
+    setPressed(null)
+  }
+
   // the keyboard listener always calls the latest press()
   const pressFromKeyboard = useEffectEvent(press)
 
@@ -292,14 +297,15 @@ export function Keycaps(): ReactNode {
   return (
     <div ref={boxRef} className='flex w-full flex-col items-center gap-2'>
       <div
-        className='relative aspect-square w-full touch-none'
-        onPointerLeave={() => {
-          pressedRef.current = null
-          setPressed(null)
-        }}
+        // vertical swipes scroll the page; a swipe that starts on a key cancels its press
+        className='relative aspect-square w-full touch-pan-y'
+        onPointerLeave={release}
+        onPointerCancel={release}
       >
         <Canvas
           frameloop={onScreen ? 'always' : 'never'}
+          // measure layout size: the hero's scale-in would otherwise freeze a too-small canvas
+          resize={{ offsetSize: true }}
           camera={{ position: [0, 5.8, 5], fov: 34 }}
           onCreated={({ camera }) => camera.lookAt(0, 0.2, 0)}
           dpr={[1, 2]}

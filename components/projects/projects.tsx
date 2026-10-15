@@ -4,7 +4,7 @@ import { ArrowRight, ArrowUpRight, Github } from 'lucide-react'
 import { motion, useMotionValue, useSpring } from 'motion/react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 
 import { FadeIn } from '@/components/ui/motion-primitives'
 import { useReducedMotion } from '@/lib/motion'
@@ -251,8 +251,25 @@ export function ProjectIndex(): ReactNode {
  * full-page screenshot inside it, facts sit beside the frame.
  */
 export function ProjectWindows(): ReactNode {
+  const sectionRef = useRef<HTMLElement>(null)
+
+  // touch screens pan each window on a loop: start it when the window is in
+  // view, drop it (back to the top) when it leaves
+  useEffect(() => {
+    const frames = sectionRef.current?.querySelectorAll<HTMLElement>(`.${styles.frame}`)
+    if (!frames?.length) return
+    const io = new IntersectionObserver(
+      entries => {
+        for (const e of entries) e.target.toggleAttribute('data-inview', e.isIntersecting)
+      },
+      { threshold: 0.5 }
+    )
+    frames.forEach(f => io.observe(f))
+    return () => io.disconnect()
+  }, [])
+
   return (
-    <section className='relative w-full' aria-label='Projects'>
+    <section ref={sectionRef} className='relative w-full' aria-label='Projects'>
       <div className='mx-auto flex w-full max-w-300 flex-col gap-20 px-6 sm:px-10 md:gap-28'>
         {PROJECTS.map((p, i) => (
           <FadeIn key={p.id}>

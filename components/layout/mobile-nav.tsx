@@ -149,10 +149,9 @@ export default function MobileNav() {
                     </StaggerContainer>
                   </nav>
 
-                  {/* Theme toggle - reuses the exact component from the desktop navbar */}
+                  {/* Theme toggle - same component as the desktop navbar, without the circle reveal */}
                   <div className='mt-auto flex pt-6 pb-2'>
-                    <ThemeToggle />
-                    <p className='text'></p>
+                    <ThemeToggle reveal={false} />
                   </div>
                 </motion.div>
               </div>
