@@ -19,15 +19,24 @@ const CHIPS: Chip[] = [
     fg: '#ffffff',
     iconUrl: 'https://svgl.app/library/figma.svg',
   },
-  { label: 'React', slug: 'react', bg: '#1FB6CB', fg: '#ffffff' },
+  { label: 'React', slug: 'react', bg: '#087EA4', fg: '#ffffff' },
+  {
+    label: 'Zustand',
+    slug: 'zustand',
+    bg: '#5C4632',
+    fg: '#ffffff',
+    iconUrl: 'https://zustand.docs.pmnd.rs/favicon.ico',
+  },
+  { label: 'TanStack Query', slug: 'reactquery', bg: '#D61F35', fg: '#ffffff' },
   { label: 'Next.js', slug: 'nextdotjs', bg: '#1f1f1f', fg: '#ffffff' },
   { label: 'TypeScript', slug: 'typescript', bg: '#2F74C0', fg: '#ffffff' },
   { label: 'shadcn/ui', slug: 'shadcnui', bg: '#5b54ff', fg: '#ffffff' },
+  { label: 'Git', slug: 'git', bg: '#D63B1F', fg: '#ffffff' },
   { label: 'GitHub', slug: 'github', bg: '#181717', fg: '#ffffff' },
-  { label: 'Vercel', slug: 'vercel', bg: '#0a0a0a', fg: '#ffffff' },
-  { label: 'Tailwind CSS', slug: 'tailwindcss', bg: '#2BBCF5', fg: '#ffffff' },
+  { label: 'Docker', slug: 'docker', bg: '#1D63ED', fg: '#ffffff' },
+  { label: 'Tailwind CSS', slug: 'tailwindcss', bg: '#0369A1', fg: '#ffffff' },
   { label: 'Prisma', slug: 'prisma', bg: '#0a0a0a', fg: '#ffffff' },
-  { label: 'Claude Code', slug: 'claude', bg: '#da7757', fg: '#ffffff' },
+  { label: 'Claude Code', slug: 'claude', bg: '#B5532F', fg: '#ffffff' },
 ]
 
 const CHIP_RADIUS = 14
@@ -213,9 +222,9 @@ export function Stack(): ReactNode {
   return (
     <div className='flex flex-col gap-3'>
       <div className='flex items-center gap-3'>
-        <h3 className='text-foreground text-[15px] font-semibold tracking-tight'>
+        <h2 className='text-foreground text-[18px] font-semibold tracking-tight'>
           Stack
-        </h3>
+        </h2>
       </div>
 
       <div className='border-foreground/5 bg-foreground/2 dark:bg-foreground/5 relative h-80 overflow-hidden rounded-4xl border sm:h-72'>
