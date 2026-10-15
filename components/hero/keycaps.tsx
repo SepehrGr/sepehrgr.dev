@@ -332,14 +332,22 @@ export function Keycaps(): ReactNode {
         or click a key
       </p>
 
-      {/* the same actions for keyboard and screen-reader users */}
-      <div className='sr-only'>
+      {/* the same actions for keyboard and screen-reader users; shown once tabbed into */}
+      <div className='sr-only focus-within:not-sr-only focus-within:flex focus-within:flex-wrap focus-within:justify-center focus-within:gap-2'>
         {keys.map(k => (
-          <button key={k.id} type='button' aria-keyshortcuts={k.letter.toUpperCase()} onClick={() => run(k.id)}>
+          <button
+            key={k.id}
+            type='button'
+            aria-keyshortcuts={k.letter.toUpperCase()}
+            onClick={() => run(k.id)}
+            className='focus-ring border-foreground/15 bg-background text-foreground rounded-lg border px-3 py-1.5 text-sm font-medium'
+          >
             {k.a11y}
           </button>
         ))}
-        <span role='status'>{copied ? 'Email copied' : ''}</span>
+        <span role='status' className='sr-only'>
+          {copied ? 'Email copied' : ''}
+        </span>
       </div>
     </div>
   )
