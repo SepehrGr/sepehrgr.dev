@@ -36,11 +36,11 @@ export function ContactCard(): ReactNode {
                 <h2 className='text-foreground text-[2.25rem] leading-[1.05] font-semibold tracking-tight sm:text-[2.75rem] lg:text-[3.25rem]'>
                   Let&rsquo;s connect
                 </h2>
-                <p className='text-foreground/65 mb-6 max-w-[32ch] text-[18px] leading-[1.4] tracking-tight sm:text-[22px]'>
-                  Always looking forward to talk about roles, projects, or ideas
-                  where strong frontend craft can make a difference.{' '}
+                <p className='text-foreground/85 mb-6 max-w-[32ch] text-[18px] leading-[1.4] tracking-tight sm:text-[22px]'>
+                  Always looking forward to talking about roles, projects, or
+                  ideas where strong frontend craft can make a difference.
                 </p>
-                <p className='text-foreground/65 mb-6 text-[18px] leading-[1.4] tracking-tight sm:text-[22px]'>
+                <p className='text-foreground/85 mb-6 text-[18px] leading-[1.4] tracking-tight sm:text-[22px]'>
                   Reach out at{' '}
                   <a
                     href='mailto:contact@sepehrgr.dev'
@@ -64,28 +64,21 @@ export function ContactCard(): ReactNode {
                 <ContactCardCtas />
               </div>
 
-              <div className='border-foreground/8 bg-background/35 dark:bg-background/50 flex flex-col items-center justify-center gap-6 rounded-[1.6rem] border p-6 backdrop-blur-xs sm:p-8'>
+              {/* a hairline divider instead of a card inside the card */}
+              <div className='border-foreground/10 flex flex-col items-center justify-center gap-6 border-t pt-8 md:border-t-0 md:border-l md:pt-0 md:pl-6'>
                 <motion.div
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2, duration: 1.6, ease: EASE }}
                   className='flex flex-col items-center gap-4'
                 >
-                  <div className='text-foreground/75 flex items-center gap-2 text-[14px] tracking-tight'>
-                    <span className='relative inline-flex h-2.5 w-2.5 items-center justify-center'>
-                      <motion.span
-                        className='absolute inline-flex h-full w-full -translate-y-px rounded-full bg-green-500/50 dark:bg-green-600/70'
-                        animate={{
-                          scale: [1, 1.65, 1],
-                          opacity: [0.75, 0.1, 0.75],
-                        }}
-                        transition={{
-                          duration: 2.2,
-                          repeat: Infinity,
-                          ease: EASE,
-                        }}
+                  <div className='text-foreground/90 flex items-center gap-2 text-[14px] tracking-tight'>
+                    <span className='relative inline-flex h-2.5 w-2.5 -translate-y-px items-center justify-center'>
+                      <span
+                        aria-hidden='true'
+                        className='status-ripple absolute inset-0 rounded-full'
                       />
-                      <span className='relative inline-flex h-2.5 w-2.5 -translate-y-px rounded-full bg-green-500/70 dark:bg-green-300/70' />
+                      <span className='relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500 dark:bg-green-400' />
                     </span>
                     <span>Open to select opportunities</span>
                   </div>
@@ -112,7 +105,7 @@ export function ContactCard(): ReactNode {
                   </div>
                 </motion.div>
                 <div className='flex flex-col items-center gap-1 text-center'>
-                  <p className='text-foreground/75 text-[13px] tracking-tight'>
+                  <p className='text-foreground/90 text-[13px] tracking-tight'>
                     &copy; 2026 Sepehr Gorgini
                   </p>
                 </div>
