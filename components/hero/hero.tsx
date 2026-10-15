@@ -1,13 +1,16 @@
 'use client'
 import type { ReactNode } from 'react'
 
+import dynamic from 'next/dynamic'
 import { HeroCtas } from './hero-ctas'
 import { FadeIn, ScaleUnblur } from '@/components/ui/motion-primitives'
-import { PortraitMorph } from './portrait-morph'
 import RotatingText from '../ui/rotating-text'
 
-const PORTRAIT_SRC = '/sepehr.webp'
-const PORTRAIT_HOVER_SRC = '/sepehr-wave.webp'
+// three.js loads after first paint, in its own chunk
+const Keycaps = dynamic(() => import('./keycaps').then(m => m.Keycaps), {
+  ssr: false,
+  loading: () => <div className='aspect-square w-full' />,
+})
 
 export function Hero(): ReactNode {
   return (
@@ -32,12 +35,12 @@ export function Hero(): ReactNode {
                 texts={[
                   'Problem Solver',
                   'UX-Minded Builder',
-                  'Detail-Oriented',
                   'Pixel Perfectionist',
                   'Lifelong Learner',
+                  'Dark-Mode Purist',
                 ]}
                 mainClassName='bg-foreground rounded-xl md:rounded-2xl text-background overflow-hidden p-2 md:px-3'
-                staggerFrom='last'
+                staggerFrom='first'
                 initial={{ y: '100%' }}
                 animate={{ y: 0 }}
                 exit={{ y: '-120%' }}
@@ -54,22 +57,16 @@ export function Hero(): ReactNode {
             </h1>
 
             <p className='text-foreground/65 max-w-[31ch] text-[18px] leading-[1.4] tracking-tight md:text-[22px]'>
-              I craft interfaces that balance clarity, performance, and polish —
-              without overcomplicating the product.{' '}
+              I craft interfaces that balance clarity, performance, and polish,
+              without overcomplicating the product.
             </p>
 
             <HeroCtas />
           </FadeIn>
 
-          <ScaleUnblur className='flex justify-stretch md:justify-end'>
-            <div className='border-foreground/8 bg-background relative aspect-square w-full overflow-hidden rounded-4xl border p-1.5 shadow-sm md:max-w-105'>
-              <div className='relative h-full w-full overflow-hidden rounded-[1.6rem]'>
-                <PortraitMorph
-                  srcA={PORTRAIT_SRC}
-                  srcB={PORTRAIT_HOVER_SRC}
-                  alt='Illustrated portrait of Sepehr Gorgini'
-                />
-              </div>
+          <ScaleUnblur className='flex justify-center md:justify-end'>
+            <div className='w-full md:max-w-140'>
+              <Keycaps />
             </div>
           </ScaleUnblur>
         </div>
