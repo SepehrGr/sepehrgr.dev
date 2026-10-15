@@ -18,7 +18,7 @@ export function PageBackdrop(): ReactNode {
         <ShaderFlow
           colorLowA={isDark ? [0.15, 0.1, 0.4] : [0.15, 0.1, 0.5]}
           colorHighA={isDark ? [0.4, 0.4, 0.4] : [0.6, 0.6, 0.6]}
-          brightness={isDark ? 3 : 2}
+          brightness={isDark ? 2.2 : 2}
           iterations={15}
           flowSpeed={[0.15, 0.25]}
         />

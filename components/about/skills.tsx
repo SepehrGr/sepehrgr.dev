@@ -14,9 +14,9 @@ const SKILLS = [
 export function Skills(): ReactNode {
   return (
     <div className='flex flex-col gap-3'>
-      <h3 className='text-foreground text-[15px] font-semibold tracking-tight'>
+      <h2 className='text-foreground text-[18px] font-semibold tracking-tight'>
         What I do
-      </h3>
+      </h2>
       <div className='border-foreground/5 bg-foreground/2 dark:bg-foreground/5 rounded-4xl border p-2 sm:p-4'>
         <div className='flex flex-wrap gap-3'>
           {SKILLS.map(skill => (

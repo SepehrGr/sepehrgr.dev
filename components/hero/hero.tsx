@@ -56,7 +56,7 @@ export function Hero(): ReactNode {
               />
             </h1>
 
-            <p className='text-foreground/65 max-w-[31ch] text-[18px] leading-[1.4] tracking-tight md:text-[22px]'>
+            <p className='text-foreground/75 max-w-[31ch] text-[18px] leading-[1.4] tracking-tight md:text-[22px]'>
               I craft interfaces that balance clarity, performance, and polish,
               without overcomplicating the product.
             </p>

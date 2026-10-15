@@ -20,7 +20,7 @@ export default function ProjectsPage(): ReactNode {
           <h1 className='text-foreground font-serif text-[2.75rem] leading-[1.05] font-medium tracking-tight md:text-[3.25rem] lg:text-[3.75rem]'>
             A little closer to the work.
           </h1>
-          <p className='text-foreground/65 max-w-[38ch] text-[20px] leading-[1.4] tracking-tight sm:text-[22px]'>
+          <p className='text-foreground/75 max-w-[38ch] text-[20px] leading-[1.4] tracking-tight sm:text-[22px]'>
             Each project sits in a live window. Hover to scroll through it, or
             visit the real thing.
           </p>
