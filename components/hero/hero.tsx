@@ -1,6 +1,7 @@
 'use client'
 import type { ReactNode } from 'react'
 
+import { useReducedMotion } from 'motion/react'
 import dynamic from 'next/dynamic'
 import { HeroCtas } from './hero-ctas'
 import { FadeIn, ScaleUnblur } from '@/components/ui/motion-primitives'
@@ -13,6 +14,8 @@ const Keycaps = dynamic(() => import('./keycaps').then(m => m.Keycaps), {
 })
 
 export function Hero(): ReactNode {
+  // reduced-motion visitors get the first phrase, still
+  const reduceMotion = useReducedMotion()
   return (
     // at least one screen tall so the first view shows only the hero
     <section className='relative min-h-svh w-full'>
@@ -51,7 +54,7 @@ export function Hero(): ReactNode {
                 splitBy='characters'
                 animatePresenceMode='wait'
                 animatePresenceInitial={false}
-                auto
+                auto={!reduceMotion}
                 loop
               />
             </h1>
