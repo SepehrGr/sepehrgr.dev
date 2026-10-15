@@ -2,46 +2,6 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-@font-face {
-  font-family: 'j';
-  src: url('../assets/j-light.ttf') format('truetype');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'j';
-  src: url('../assets/j-regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'j';
-  src: url('../assets/j-medium.ttf') format('truetype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'j';
-  src: url('../assets/j-semibold.ttf') format('truetype');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'j';
-  src: url('../assets/j-bold.ttf') format('truetype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
 :root {
   --background: #f9f8f6;
   --foreground: #0a0a0a;
@@ -50,10 +10,8 @@
   --border: #e5e5e5;
   --ring: #0066ff;
   --frame: #f9f8f6;
-  --font-sans:
-    'j', var(--font-geist-sans), system-ui, -apple-system, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
-  --font-serif: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-sans: var(--font-jokker), system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, monospace;
 }
 
 .dark {
@@ -75,7 +33,6 @@
   --color-ring: var(--ring);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
-  --font-serif: var(--font-serif);
 }
 
 html {

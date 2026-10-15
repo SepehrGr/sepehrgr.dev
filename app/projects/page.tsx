@@ -17,7 +17,7 @@ export default function ProjectsPage(): ReactNode {
       <section className='relative mx-auto w-full max-w-275 overflow-hidden px-6 pt-44 pb-16 sm:px-10 sm:pt-100 sm:pb-20'>
         <div className='bg-foreground/5 pointer-events-none absolute top-24 left-1/2 -z-10 h-100 w-100 -translate-x-1/2 rounded-full blur-3xl' />
         <FadeIn className='flex flex-col items-center gap-5 text-center'>
-          <h1 className='text-foreground font-serif text-[2.75rem] leading-[1.05] font-medium tracking-tight md:text-[3.25rem] lg:text-[3.75rem]'>
+          <h1 className='text-foreground text-[2.75rem] leading-[1.05] font-medium tracking-tight md:text-[3.25rem] lg:text-[3.75rem]'>
             A little closer to the work.
           </h1>
           <p className='text-foreground/75 max-w-[38ch] text-[20px] leading-[1.4] tracking-tight sm:text-[22px]'>

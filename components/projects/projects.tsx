@@ -306,6 +306,7 @@ export function ProjectWindows(): ReactNode {
                       height={p.shot.height}
                       sizes='(min-width: 768px) 640px, 100vw'
                       priority={i === 0}
+                      loading={i === 1 ? 'eager' : undefined}
                       className={`${styles.shot} block h-auto w-full`}
                     />
                   </div>

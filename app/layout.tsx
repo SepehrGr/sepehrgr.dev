@@ -26,9 +26,9 @@ export default function RootLayout({
   children: ReactNode
 }>): ReactNode {
   return (
-    <html lang='en' suppressHydrationWarning>
+    <html lang='en' className={Jokker.variable} suppressHydrationWarning>
       <body
-        className={`${Jokker.className} bg-background text-foreground min-h-screen font-sans antialiased`}
+        className='bg-background text-foreground min-h-screen font-sans antialiased'
       >
         <Providers>
           <div className='site-frame site-frame--top' aria-hidden='true' />
