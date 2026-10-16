@@ -177,15 +177,17 @@ function Board({ keys, palette, font, pressed, copied, press }: { keys: KeyDef[]
   const board = useRef<THREE.Group>(null)
   // tilt a little toward the cursor; not on touch, where a finger drag means scroll
   const still = useMemo(() => window.matchMedia('(prefers-reduced-motion: reduce), (hover: none)').matches, [])
+  // lean the board toward the viewer on small screens so the legends read face-on
+  const lean = useMemo(() => (window.matchMedia('(max-width: 767px)').matches ? 0.2 : 0), [])
   useFrame(({ pointer }, dt) => {
     if (!board.current || still) return
     const r = board.current.rotation
-    r.x += (pointer.y * 0.12 - r.x) * Math.min(1, dt * 4)
+    r.x += (lean + pointer.y * 0.12 - r.x) * Math.min(1, dt * 4)
     r.y += (pointer.x * 0.2 - r.y) * Math.min(1, dt * 4)
   })
   const width = 2 * KEY + GAP + 0.5
   return (
-    <group ref={board}>
+    <group ref={board} rotation-x={lean}>
       <RoundedBox args={[width, 0.5, width]} radius={0.24} smoothness={4}>
         <meshPhysicalMaterial color={palette.metal} roughness={0.3} metalness={0.4} clearcoat={0.3} />
       </RoundedBox>
