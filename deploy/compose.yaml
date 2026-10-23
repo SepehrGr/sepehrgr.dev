@@ -4,3 +4,10 @@ services:
     restart: unless-stopped
     ports:
       - "127.0.0.1:3000:3000"
+    # Docker keeps every line a container prints unless told otherwise: cap it
+    # at 3 files of 10 MB. Applies when the container is (re)created.
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
